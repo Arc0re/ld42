@@ -12,7 +12,8 @@ var smallPlanetData = {
     ".", ".", ".", ".", "x", "x", ".", ".", ".", ".",
   ],
   width: 10,
-  height: 10
+  height: 10,
+  health: 20
 };
 
 var mediumPlanetData = {
@@ -35,7 +36,8 @@ var mediumPlanetData = {
     ".", ".", ".", ".", ".", ".", "x", "x", "x", "x", ".", ".", ".", ".", ".", ".",
   ],
   width: 16,
-  height: 16
+  height: 16,
+  health: 50
 };
 
 const MAX_PLANET_PIXEL_SIZE = 16*8;
@@ -54,6 +56,14 @@ class Planets {
     this.planets.push(new Planet("medium_ice_planet", {x: Utils.randInt(0, canvas.width-MAX_PLANET_PIXEL_SIZE), y: Utils.randInt(0, canvas.height-MAX_PLANET_PIXEL_SIZE)}, "ice", mediumPlanetData));
     this.planets.push(new Planet("medium_red_planet", {x: Utils.randInt(0, canvas.width-MAX_PLANET_PIXEL_SIZE), y: Utils.randInt(0, canvas.height-MAX_PLANET_PIXEL_SIZE)}, "red", mediumPlanetData));
     for (var p = 0; p < this.planets.length; p++) this.planets[p].init();
+  }
+
+  getRemaining() {
+    return this.planets.length;
+  }
+
+  getPlanet(index) {
+    return this.planets[index];
   }
 
   render() {

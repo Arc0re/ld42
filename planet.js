@@ -30,6 +30,11 @@ class Planet {
     this.origin = origin;
     this.name = name;
     this.colour = colour;
+    this.health = planetData.health;
+  }
+
+  getTranslatedOrigin() {
+    return {x: this.origin.x*CANVAS_SCALE, y: this.origin.y*CANVAS_SCALE};
   }
 
   init() {

@@ -41,11 +41,13 @@ var canvas = document.getElementById("game_canvas"),
   keysDown = [],
   doneLoading = false,
   fontLoaded = false,
+  mousePos = null,
 
   sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT),
   spaceMap = new Space(SPACE_WIDTH, SPACE_HEIGHT),
   player = new Player(),
-  planets = new Planets();
+  planets = new Planets(),
+  monsters = new Monsters();
 
 
 // Entry point & Event listeneners
@@ -70,6 +72,11 @@ document.addEventListener(
     fontLoaded = true;
   }
 );
+
+// Mouse
+document.addEventListener('mousemove', function (evt) {
+  mousePos = Utils.getMousePos(canvas, evt);
+});
 
 function init() {
   // https://stackoverflow.com/questions/3437786/get-the-size-of-the-screen-current-web-page-and-browser-window
@@ -127,6 +134,7 @@ function update(delta) {
   if (sp.y * CANVAS_SCALE >= GAME_AREA_PIXEL_HEIGHT_SCALED) sprite.y = 0;
   sprite.setPos({x: sprite.getPos().x + pixPerSec * delta, y: sprite.getPos().y + pixPerSec * delta});
 
+  monsters.update(delta);
   player.update(delta);
 }
 
@@ -147,17 +155,27 @@ function render() {
 
       spaceMap.render();
       planets.render();
+      monsters.render();
       sprite.render();
       player.render();
 
       //ctx.restore();
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.setTransform(1, 0, 0, 1, 0, 0); // faster??
 
       if (fontLoaded) {
-        png_font.drawText("hello world!", [32, 32]);
-        png_font.drawText("한국어!", [48, 64], "#559");
-        png_font.drawText("日本語!", [64, 96], "red", 2);
-        png_font.drawText("Café", [160, 40], 'orange', 4, 'blue');
+        // png_font.drawText("hello world!", [32, 32]);
+        // png_font.drawText("한국어!", [48, 64], "#559");
+        // png_font.drawText("日本語!", [64, 96], "red", 2);
+        // png_font.drawText("Café", [160, 40], 'orange', 4, 'blue');
+        png_font.drawText("Planets remaining: " + planets.getRemaining(), [10, canvas.height-40], "lightblue", 2, "blue");
+        // for (var i=0;i<planets.getRemaining(); i++) {
+        //   var p = planets.getPlanet(i);
+        //   if (p) png_font.drawText("Health: " + p.health, [p.origin.x, p.origin.y-16], "red", 1);
+        // }
+        // try {
+        //   png_font.drawText("MousePos: " + mousePos.x + "," + mousePos.y, [5, 0], "lightblue", 2, "blue");
+        //   png_font.drawText("Translated MousePos: " + ((mousePos.x - canvas.width * 0.5)/CANVAS_SCALE) + "," + ((mousePos.y - canvas.height * 0.5)/CANVAS_SCALE), [5, 22], "lightblue", 2, "blue");
+        // } catch (ex) {}
       }
 
       break;
