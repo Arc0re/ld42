@@ -1,20 +1,40 @@
-const FPS_DIVIDER = 1000.0,
+const
+  FPS_DIVIDER = 1000.0,
   SPRITESHEET_PATH = "gfx/spritesheet.png",
+  CANVAS_SCALE = 4,
+
   BLOCK_WIDTH = 8,
   BLOCK_HEIGHT = 8,
-  CANVAS_SCALE = 4,
-  SPACE_WIDTH = 200,
-  SPACE_HEIGHT = 200,
+  SPACE_WIDTH = 50,
+  SPACE_HEIGHT = 50,
+
   SPACETILE_STAR0 = 1,
   SPACETILE_STAR1 = 2,
-  SPACETILE_STAR2 = 3;
+  SPACETILE_STAR2 = 3,
+
+  GAMESTATE_MENU = 0,
+  GAMESTATE_INGAME = 1,
+  GAMESTATE_NONE = 99,
+
+  KEYBOARD_RIGHT = 39,
+  KEYBOARD_LEFT = 37,
+  KEYBOARD_UP = 38,
+  KEYBOARD_DOWN = 40,
+
+  // Mapping starts from 0 cuz we don't wanna loop until 39 for nothing
+  RIGHT_KEY = 0,
+  LEFT_KEY = 1,
+  UP_KEY = 2,
+  DOWN_KEY = 3;
 
 var canvas = document.getElementById("game_canvas"),
   ctx = canvas.getContext("2d"),
   lastTime = null,
   spriteSheet = new Image(),
   doneLoading = false,
-  windowWidth = 0, windowHeight = 0;
+  windowWidth = 0, windowHeight = 0,
+  currentState = GAMESTATE_NONE,
+  keysDown = [];
 
 // Type definitions
 
@@ -85,10 +105,32 @@ class Space {
   }
 }
 
+class Player {
+  constructor() {
+    this.sprite = new Sprite(3, 26, BLOCK_WIDTH, BLOCK_HEIGHT);
+    this.sprite.setPos({x: 20, y: 20});
+    this.pixPerFrame = 50;
+  }
+
+  update(delta) {
+    var p = this.pixPerFrame;
+    if (keysDown[LEFT_KEY]) this.sprite.x = this.sprite.x-p*delta;
+    if (keysDown[RIGHT_KEY]) this.sprite.x = this.sprite.x+p*delta;
+    if (keysDown[UP_KEY]) this.sprite.y = this.sprite.y-p*delta;
+    if (keysDown[DOWN_KEY]) this.sprite.y = this.sprite.y+p*delta;
+  }
+
+  render() {
+    this.sprite.render();
+  }
+}
+
 var sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT);
 var space = new Space(SPACE_WIDTH, SPACE_HEIGHT);
+var player = new Player();
 
-// Entry point
+
+// Entry point & Event listeneners
 window.addEventListener('load', function () {
   init();
 }, false);
@@ -98,6 +140,11 @@ spriteSheet.addEventListener('load', function () {
   console.log("Loaded " + SPRITESHEET_PATH);
   doneLoading = true;
 }, false);
+
+// Inputs
+document.addEventListener('keydown', keyDownHandler, false);
+document.addEventListener('keyup', keyUpHandler, false);
+
 
 function init() {
   // https://stackoverflow.com/questions/3437786/get-the-size-of-the-screen-current-web-page-and-browser-window
@@ -123,14 +170,16 @@ function init() {
 
   // Initialisation
   space.init();
-  console.log(space);
 
   // Loading
   spriteSheet.src = SPRITESHEET_PATH;
 
   lastTime = Date.now();
+  currentState = GAMESTATE_INGAME;
   tick();
 }
+
+// ENGINE FUNCS
 
 function tick() {
   var now = Date.now();
@@ -144,15 +193,45 @@ function tick() {
 }
 
 function update(delta) {
-  sprite.setPos({x: 20, y: 20});
+  var pixPerSec = 50;
+  var sp = sprite.getPos();
+  if (sp.x*CANVAS_SCALE >= canvas.width) sprite.x = 0;
+  if (sp.y*CANVAS_SCALE >= canvas.height) sprite.y = 0;
+  sprite.setPos({x: sprite.getPos().x+pixPerSec*delta, y: sprite.getPos().y+pixPerSec*delta});
+
+  player.update(delta);
 }
 
+var cameraMoved = false;
 function render() {
-  if (doneLoading) {
-    space.render();
+  if (doneLoading && currentState === GAMESTATE_INGAME) {
+    if (!cameraMoved) {
+      space.render();
+      cameraMoved = false;
+    }
     sprite.render();
+    player.render();
   }
 }
+
+// Retarded
+function keyDownHandler(event) {
+  switch (event.keyCode) {
+    case KEYBOARD_DOWN: keysDown[DOWN_KEY] = true; break;
+    case KEYBOARD_UP: keysDown[UP_KEY] = true; break;
+    case KEYBOARD_LEFT: keysDown[LEFT_KEY] = true; break;
+    case KEYBOARD_RIGHT: keysDown[RIGHT_KEY] = true; break;
+  }
+}
+function keyUpHandler(event) {
+  switch (event.keyCode) {
+    case KEYBOARD_DOWN: keysDown[DOWN_KEY] = false; break;
+    case KEYBOARD_UP: keysDown[UP_KEY] = false; break;
+    case KEYBOARD_LEFT: keysDown[LEFT_KEY] = false; break;
+    case KEYBOARD_RIGHT: keysDown[RIGHT_KEY] = false; break;
+  }
+}
+
 
 // Utils
 function randInt(from, to) {
