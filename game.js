@@ -5,8 +5,12 @@ const
 
   BLOCK_WIDTH = 8,
   BLOCK_HEIGHT = 8,
-  SPACE_WIDTH = 50,
-  SPACE_HEIGHT = 50,
+  SPACE_WIDTH = 100,
+  SPACE_HEIGHT = 100,
+  GAME_AREA_PIXEL_WIDTH = SPACE_WIDTH*BLOCK_WIDTH,
+  GAME_AREA_PIXEL_HEIGHT = SPACE_HEIGHT*BLOCK_HEIGHT,
+  GAME_AREA_PIXEL_WIDTH_SCALED = GAME_AREA_PIXEL_WIDTH*CANVAS_SCALE,
+  GAME_AREA_PIXEL_HEIGHT_SCALED = GAME_AREA_PIXEL_HEIGHT*CANVAS_SCALE,
 
   SPACETILE_STAR0 = 1,
   SPACETILE_STAR1 = 2,
@@ -38,7 +42,7 @@ var canvas = document.getElementById("game_canvas"),
   doneLoading = false,
 
   sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT),
-  space = new Space(SPACE_WIDTH, SPACE_HEIGHT),
+  spaceMap = new Space(SPACE_WIDTH, SPACE_HEIGHT),
   player = new Player();
 
 
@@ -78,10 +82,15 @@ function init() {
   ctx.msImageSmoothingEnabled = false;
   ctx.imageSmoothingEnabled = false;
 
-  ctx.scale(CANVAS_SCALE, CANVAS_SCALE);
+  //ctx.scale(CANVAS_SCALE, CANVAS_SCALE);
 
   // Initialisation
-  space.init();
+  spaceMap.init();
+  // player.sprite.setPos({
+  //     x: ((canvas.width/2)-player.sprite.width/2)/CANVAS_SCALE,
+  //     y: ((canvas.height/2)-player.sprite.height/2)/CANVAS_SCALE
+  //   });
+  player.sprite.setPos({x: GAME_AREA_PIXEL_WIDTH/2, y: GAME_AREA_PIXEL_HEIGHT/2});
 
   // Loading
   spriteSheet.src = SPRITESHEET_PATH;
@@ -105,22 +114,44 @@ function tick() {
 function update(delta) {
   var pixPerSec = 50;
   var sp = sprite.getPos();
-  if (sp.x*CANVAS_SCALE >= canvas.width) sprite.x = 0;
-  if (sp.y*CANVAS_SCALE >= canvas.height) sprite.y = 0;
+  if (sp.x*CANVAS_SCALE >= GAME_AREA_PIXEL_WIDTH_SCALED) sprite.x = 0;
+  if (sp.y*CANVAS_SCALE >= GAME_AREA_PIXEL_HEIGHT_SCALED) sprite.y = 0;
   sprite.setPos({x: sprite.getPos().x+pixPerSec*delta, y: sprite.getPos().y+pixPerSec*delta});
 
   player.update(delta);
 }
 
-var cameraMoved = false;
 function render() {
-  if (doneLoading && currentState === GAMESTATE_INGAME) {
-    if (!cameraMoved) {
-      space.render();
-      cameraMoved = false;
-    }
-    sprite.render();
-    player.render();
+  if (!doneLoading) return;
+
+  switch (currentState) {
+    case GAMESTATE_INGAME:
+      //ctx.save();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      var px = player.sprite.x;//*CANVAS_SCALE;
+      var py = player.sprite.y;//*CANVAS_SCALE;
+
+      console.log(px, py);
+
+      // Keep the player centered on the canvas
+      //ctx.translate(-(px - canvas.width / 2), -(py - canvas.height / 2));
+      // ctx.translate(-px, -py);
+      // ctx.translate(canvas.width/2, canvas.height/2);
+      ctx.translate(-(px - canvas.width * 0.5), -(py - canvas.height * 0.5));
+      ctx.scale(CANVAS_SCALE, CANVAS_SCALE);
+
+      spaceMap.render();
+      sprite.render();
+      player.render();
+
+      //ctx.restore();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+      break;
+
+    default:
+      break;
   }
 }
 
@@ -133,6 +164,7 @@ function keyDownHandler(event) {
     case KEYBOARD_RIGHT: keysDown[RIGHT_KEY] = true; break;
   }
 }
+
 function keyUpHandler(event) {
   switch (event.keyCode) {
     case KEYBOARD_DOWN: keysDown[DOWN_KEY] = false; break;

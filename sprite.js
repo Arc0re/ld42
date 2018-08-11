@@ -19,6 +19,6 @@ class Sprite {
   }
 
   render() {
-    ctx.drawImage(spriteSheet, this.srcX, this.srcY, this.width, this.height, this.x, this.y, this.width, this.height);
+    ctx.drawImage(spriteSheet, this.srcX, this.srcY, this.width, this.height, this.x/CANVAS_SCALE, this.y/CANVAS_SCALE, this.width, this.height);
   }
 }

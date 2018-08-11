@@ -5,10 +5,14 @@ class Space {
     this.map = [];
   }
 
+  getTileAt(x, y) {
+    return this.map[x+y*this.width];
+  }
+
   init() {
     for (var x = 0; x < this.width; x++) {
       for (var y = 0; y < this.height; y++) {
-        var tileNum = Utils.randInt(1, 4);
+        var tileNum = Utils.randInt(1, 10);
         var newSprite = null;
         switch (tileNum) {
           case SPACETILE_STAR0:
@@ -33,7 +37,8 @@ class Space {
         var currentTile = this.map[x + y * this.width];
         if (currentTile) {
           currentTile.setPos({x: x * currentTile.width, y: y * currentTile.height});
-          currentTile.render();
+          //currentTile.render();
+          ctx.drawImage(spriteSheet, currentTile.srcX, currentTile.srcY, currentTile.width, currentTile.height, currentTile.x, currentTile.y, currentTile.width, currentTile.height);
         }
       }
     }
