@@ -2,7 +2,7 @@ class Player {
   constructor() {
     this.sprite = new Sprite(3, 26, BLOCK_WIDTH, BLOCK_HEIGHT, "player_sprite");
     this.sprite.setPos({x: 0, y: 0});
-    this.pixPerFrame = 150;
+    this.pixPerFrame = 250;
   }
 
   update(delta) {

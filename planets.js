@@ -38,14 +38,21 @@ var mediumPlanetData = {
   height: 16
 };
 
+const MAX_PLANET_PIXEL_SIZE = 16*8;
+
 class Planets {
   constructor() {
     this.planets = [];
-    this.planets.push(new Planet("small_blue_planet", {x: 30, y: 10}, "blue", smallPlanetData));
-    this.planets.push(new Planet("small_red_planet", {x: 70, y: 10}, "red", smallPlanetData));
-    this.planets.push(new Planet("small_sand_planet", {x: 200, y: 110}, "sand", smallPlanetData));
-    this.planets.push(new Planet("medium_ice_planet", {x: 300, y: 110}, "ice", mediumPlanetData));
-    this.planets.push(new Planet("medium_red_planet", {x: 500, y: 300}, "red", mediumPlanetData));
+    this.planets.push(new Planet("small_blue_planet", {x: Utils.randInt(0, canvas.width-MAX_PLANET_PIXEL_SIZE), y: Utils.randInt(0, canvas.height-MAX_PLANET_PIXEL_SIZE)}, "blue", smallPlanetData));
+    this.planets.push(new Planet("small_red_planet", {x: Utils.randInt(0, canvas.width-MAX_PLANET_PIXEL_SIZE), y: Utils.randInt(0, canvas.height-MAX_PLANET_PIXEL_SIZE)}, "red", smallPlanetData));
+    this.planets.push(new Planet("small_sand_planet", {x: Utils.randInt(0, canvas.width-MAX_PLANET_PIXEL_SIZE), y: Utils.randInt(0, canvas.height-MAX_PLANET_PIXEL_SIZE)}, "sand", smallPlanetData));
+    this.planets.push(new Planet("medium_ice_planet", {x: Utils.randInt(0, canvas.width-MAX_PLANET_PIXEL_SIZE), y: Utils.randInt(0, canvas.height-MAX_PLANET_PIXEL_SIZE)}, "ice", mediumPlanetData));
+    this.planets.push(new Planet("medium_red_planet", {x: Utils.randInt(0, canvas.width-MAX_PLANET_PIXEL_SIZE), y: Utils.randInt(0, canvas.height-MAX_PLANET_PIXEL_SIZE)}, "red", mediumPlanetData));
+    this.planets.push(new Planet("small_blue_planet", {x: Utils.randInt(0, canvas.width-MAX_PLANET_PIXEL_SIZE), y: Utils.randInt(0, canvas.height-MAX_PLANET_PIXEL_SIZE)}, "blue", smallPlanetData));
+    this.planets.push(new Planet("small_red_planet", {x: Utils.randInt(0, canvas.width-MAX_PLANET_PIXEL_SIZE), y: Utils.randInt(0, canvas.height-MAX_PLANET_PIXEL_SIZE)}, "red", smallPlanetData));
+    this.planets.push(new Planet("small_sand_planet", {x: Utils.randInt(0, canvas.width-MAX_PLANET_PIXEL_SIZE), y: Utils.randInt(0, canvas.height-MAX_PLANET_PIXEL_SIZE)}, "sand", smallPlanetData));
+    this.planets.push(new Planet("medium_ice_planet", {x: Utils.randInt(0, canvas.width-MAX_PLANET_PIXEL_SIZE), y: Utils.randInt(0, canvas.height-MAX_PLANET_PIXEL_SIZE)}, "ice", mediumPlanetData));
+    this.planets.push(new Planet("medium_red_planet", {x: Utils.randInt(0, canvas.width-MAX_PLANET_PIXEL_SIZE), y: Utils.randInt(0, canvas.height-MAX_PLANET_PIXEL_SIZE)}, "red", mediumPlanetData));
     for (var p = 0; p < this.planets.length; p++) this.planets[p].init();
   }
 

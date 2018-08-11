@@ -7,10 +7,10 @@ const
   BLOCK_HEIGHT = 8,
   SPACE_WIDTH = 100,
   SPACE_HEIGHT = 100,
-  GAME_AREA_PIXEL_WIDTH = SPACE_WIDTH*BLOCK_WIDTH,
-  GAME_AREA_PIXEL_HEIGHT = SPACE_HEIGHT*BLOCK_HEIGHT,
-  GAME_AREA_PIXEL_WIDTH_SCALED = GAME_AREA_PIXEL_WIDTH*CANVAS_SCALE,
-  GAME_AREA_PIXEL_HEIGHT_SCALED = GAME_AREA_PIXEL_HEIGHT*CANVAS_SCALE,
+  GAME_AREA_PIXEL_WIDTH = SPACE_WIDTH * BLOCK_WIDTH,
+  GAME_AREA_PIXEL_HEIGHT = SPACE_HEIGHT * BLOCK_HEIGHT,
+  GAME_AREA_PIXEL_WIDTH_SCALED = GAME_AREA_PIXEL_WIDTH * CANVAS_SCALE,
+  GAME_AREA_PIXEL_HEIGHT_SCALED = GAME_AREA_PIXEL_HEIGHT * CANVAS_SCALE,
 
   SPACETILE_STAR0 = 1,
   SPACETILE_STAR1 = 2,
@@ -40,6 +40,7 @@ var canvas = document.getElementById("game_canvas"),
   currentState = GAMESTATE_NONE,
   keysDown = [],
   doneLoading = false,
+  fontLoaded = false,
 
   sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT),
   spaceMap = new Space(SPACE_WIDTH, SPACE_HEIGHT),
@@ -62,6 +63,13 @@ spriteSheet.addEventListener('load', function () {
 document.addEventListener('keydown', keyDownHandler, false);
 document.addEventListener('keyup', keyUpHandler, false);
 
+// Font
+document.addEventListener(
+  'png_font_loaded', function (e) {
+    console.log("png_font loaded !");
+    fontLoaded = true;
+  }
+);
 
 function init() {
   // https://stackoverflow.com/questions/3437786/get-the-size-of-the-screen-current-web-page-and-browser-window
@@ -87,10 +95,14 @@ function init() {
 
   // Initialisation
   spaceMap.init();
-  player.sprite.setPos({x: GAME_AREA_PIXEL_WIDTH/2, y: GAME_AREA_PIXEL_HEIGHT/2});
+  player.sprite.setPos({x: GAME_AREA_PIXEL_WIDTH / 2, y: GAME_AREA_PIXEL_HEIGHT / 2});
 
   // Loading
   spriteSheet.src = SPRITESHEET_PATH;
+  png_font.setup(
+    ctx,
+    "pngfont/unifont.png"
+  );
 
   lastTime = Date.now();
   currentState = GAMESTATE_INGAME;
@@ -111,9 +123,9 @@ function tick() {
 function update(delta) {
   var pixPerSec = 50;
   var sp = sprite.getPos();
-  if (sp.x*CANVAS_SCALE >= GAME_AREA_PIXEL_WIDTH_SCALED) sprite.x = 0;
-  if (sp.y*CANVAS_SCALE >= GAME_AREA_PIXEL_HEIGHT_SCALED) sprite.y = 0;
-  sprite.setPos({x: sprite.getPos().x+pixPerSec*delta, y: sprite.getPos().y+pixPerSec*delta});
+  if (sp.x * CANVAS_SCALE >= GAME_AREA_PIXEL_WIDTH_SCALED) sprite.x = 0;
+  if (sp.y * CANVAS_SCALE >= GAME_AREA_PIXEL_HEIGHT_SCALED) sprite.y = 0;
+  sprite.setPos({x: sprite.getPos().x + pixPerSec * delta, y: sprite.getPos().y + pixPerSec * delta});
 
   player.update(delta);
 }
@@ -129,12 +141,7 @@ function render() {
       var px = player.sprite.x;//*CANVAS_SCALE;
       var py = player.sprite.y;//*CANVAS_SCALE;
 
-      console.log(px, py);
-
       // Keep the player centered on the canvas
-      //ctx.translate(-(px - canvas.width / 2), -(py - canvas.height / 2));
-      // ctx.translate(-px, -py);
-      // ctx.translate(canvas.width/2, canvas.height/2);
       ctx.translate(-(px - canvas.width * 0.5), -(py - canvas.height * 0.5));
       ctx.scale(CANVAS_SCALE, CANVAS_SCALE);
 
@@ -146,6 +153,13 @@ function render() {
       //ctx.restore();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
 
+      if (fontLoaded) {
+        png_font.drawText("hello world!", [32, 32]);
+        png_font.drawText("한국어!", [48, 64], "#559");
+        png_font.drawText("日本語!", [64, 96], "red", 2);
+        png_font.drawText("Café", [160, 40], 'orange', 4, 'blue');
+      }
+
       break;
 
     default:
@@ -156,18 +170,34 @@ function render() {
 // Retarded
 function keyDownHandler(event) {
   switch (event.keyCode) {
-    case KEYBOARD_DOWN: keysDown[DOWN_KEY] = true; break;
-    case KEYBOARD_UP: keysDown[UP_KEY] = true; break;
-    case KEYBOARD_LEFT: keysDown[LEFT_KEY] = true; break;
-    case KEYBOARD_RIGHT: keysDown[RIGHT_KEY] = true; break;
+    case KEYBOARD_DOWN:
+      keysDown[DOWN_KEY] = true;
+      break;
+    case KEYBOARD_UP:
+      keysDown[UP_KEY] = true;
+      break;
+    case KEYBOARD_LEFT:
+      keysDown[LEFT_KEY] = true;
+      break;
+    case KEYBOARD_RIGHT:
+      keysDown[RIGHT_KEY] = true;
+      break;
   }
 }
 
 function keyUpHandler(event) {
   switch (event.keyCode) {
-    case KEYBOARD_DOWN: keysDown[DOWN_KEY] = false; break;
-    case KEYBOARD_UP: keysDown[UP_KEY] = false; break;
-    case KEYBOARD_LEFT: keysDown[LEFT_KEY] = false; break;
-    case KEYBOARD_RIGHT: keysDown[RIGHT_KEY] = false; break;
+    case KEYBOARD_DOWN:
+      keysDown[DOWN_KEY] = false;
+      break;
+    case KEYBOARD_UP:
+      keysDown[UP_KEY] = false;
+      break;
+    case KEYBOARD_LEFT:
+      keysDown[LEFT_KEY] = false;
+      break;
+    case KEYBOARD_RIGHT:
+      keysDown[RIGHT_KEY] = false;
+      break;
   }
 }

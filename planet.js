@@ -42,7 +42,7 @@ class Planet {
         this.sprites[x+y*this.width] = blockSprite;
       }
     }
-    console.log("Created planet " + this.name);
+    console.log("Created planet " + this.name + " at {x: " + this.origin.x + ", y: " + this.origin.y + "}");
   }
 
   render() {
