@@ -29,105 +29,17 @@ const
 
 var canvas = document.getElementById("game_canvas"),
   ctx = canvas.getContext("2d"),
-  lastTime = null,
   spriteSheet = new Image(),
-  doneLoading = false,
+
+  lastTime = null,
   windowWidth = 0, windowHeight = 0,
   currentState = GAMESTATE_NONE,
-  keysDown = [];
+  keysDown = [],
+  doneLoading = false,
 
-// Type definitions
-
-class Sprite {
-  constructor(srcX, srcY, width, height, name) {
-    this.srcX = srcX;
-    this.srcY = srcY;
-    this.width = width;
-    this.height = height;
-    this.name = name;
-    this.x = 0;
-    this.y = 0;
-  }
-
-  setPos(vec) {
-    this.x = vec.x;
-    this.y = vec.y;
-  }
-
-  getPos() {
-    return {x: this.x, y: this.y};
-  }
-
-  render() {
-    ctx.drawImage(spriteSheet, this.srcX, this.srcY, this.width, this.height, this.x, this.y, this.width, this.height);
-  }
-}
-
-class Space {
-  constructor(width, height) {
-    this.width = width;
-    this.height = height;
-    this.map = [];
-  }
-
-  init() {
-    for (var x = 0; x < this.width; x++) {
-      for (var y = 0; y < this.height; y++) {
-        var tileNum = randInt(1, 4);
-        var newSprite = null;
-        switch (tileNum) {
-          case SPACETILE_STAR0:
-            newSprite = new Sprite(8, 13, BLOCK_WIDTH, BLOCK_HEIGHT, "star_block_0");
-            break;
-          case SPACETILE_STAR1:
-            newSprite = new Sprite(17, 13, BLOCK_WIDTH, BLOCK_HEIGHT, "star_block_1");
-            break;
-          default:
-          case SPACETILE_STAR2:
-            newSprite = new Sprite(26, 13, BLOCK_WIDTH, BLOCK_HEIGHT, "star_block_2");
-            break;
-        }
-        this.map[x + y * this.width] = newSprite;
-      }
-    }
-  }
-
-  render() {
-    for (var x = 0; x < this.width; x++) {
-      for (var y = 0; y < this.height; y++) {
-        var currentTile = this.map[x + y * this.width];
-        if (currentTile) {
-          currentTile.setPos({x: x * currentTile.width, y: y * currentTile.height});
-          currentTile.render();
-        }
-      }
-    }
-  }
-}
-
-class Player {
-  constructor() {
-    this.sprite = new Sprite(3, 26, BLOCK_WIDTH, BLOCK_HEIGHT);
-    this.sprite.setPos({x: 20, y: 20});
-    this.pixPerFrame = 50;
-  }
-
-  update(delta) {
-    var p = this.pixPerFrame;
-    if (keysDown[LEFT_KEY]) this.sprite.x = this.sprite.x-p*delta;
-    if (keysDown[RIGHT_KEY]) this.sprite.x = this.sprite.x+p*delta;
-    if (keysDown[UP_KEY]) this.sprite.y = this.sprite.y-p*delta;
-    if (keysDown[DOWN_KEY]) this.sprite.y = this.sprite.y+p*delta;
-  }
-
-  render() {
-    this.sprite.render();
-  }
-}
-
-var sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT);
-var space = new Space(SPACE_WIDTH, SPACE_HEIGHT);
-var player = new Player();
+  sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT),
+  space = new Space(SPACE_WIDTH, SPACE_HEIGHT),
+  player = new Player();
 
 
 // Entry point & Event listeneners
@@ -179,8 +91,6 @@ function init() {
   tick();
 }
 
-// ENGINE FUNCS
-
 function tick() {
   var now = Date.now();
   var delta = (now - lastTime) / FPS_DIVIDER;
@@ -230,10 +140,4 @@ function keyUpHandler(event) {
     case KEYBOARD_LEFT: keysDown[LEFT_KEY] = false; break;
     case KEYBOARD_RIGHT: keysDown[RIGHT_KEY] = false; break;
   }
-}
-
-
-// Utils
-function randInt(from, to) {
-  return Math.floor(Math.random() * (to - from + 1) + from);
 }
