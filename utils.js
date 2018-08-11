@@ -35,3 +35,12 @@ var Utils = {
     }
   }
 };
+
+class TargetData {
+  constructor(start, end, direction, distance) {
+    this.start = start;
+    this.end = end;
+    this.direction = direction;
+    this.distance = distance;
+  }
+}

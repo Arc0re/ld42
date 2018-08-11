@@ -9,6 +9,10 @@ class Sprite {
     this.y = 0;
   }
 
+  static makeProjectileSprite(projectileData) {
+    return new Sprite(projectileData.src.x, projectileData.src.y, projectileData.size, projectileData.size, projectileData.name);
+  }
+
   setPos(vec) {
     this.x = vec.x;
     this.y = vec.y;

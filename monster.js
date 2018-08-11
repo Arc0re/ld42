@@ -1,12 +1,3 @@
-class TargetData {
-  constructor(start, end, direction, distance) {
-    this.start = start;
-    this.end = end;
-    this.direction = direction;
-    this.distance = distance;
-  }
-}
-
 class Monster {
   constructor(name, spawnPoint, health, attack) {
     var rnd = Utils.randInt(0, 5);

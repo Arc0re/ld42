@@ -2,6 +2,8 @@ const
   FPS_DIVIDER = 1000.0,
   SPRITESHEET_PATH = "gfx/spritesheet.png",
   CANVAS_SCALE = 4,
+  CANVAS_WIDTH = 800,
+  CANVAS_HEIGHT = 600,
 
   BLOCK_WIDTH = 8,
   BLOCK_HEIGHT = 8,
@@ -20,10 +22,10 @@ const
   GAMESTATE_INGAME = 1,
   GAMESTATE_NONE = 99,
 
-  KEYBOARD_RIGHT = 39,
-  KEYBOARD_LEFT = 37,
-  KEYBOARD_UP = 38,
-  KEYBOARD_DOWN = 40,
+  KEYBOARD_UP = 69,
+  KEYBOARD_DOWN = 68,
+  KEYBOARD_LEFT = 83,
+  KEYBOARD_RIGHT = 70,
 
   // Mapping starts from 0 cuz we don't wanna loop until 39 for nothing
   RIGHT_KEY = 0,
@@ -34,6 +36,7 @@ const
 var canvas = document.getElementById("game_canvas"),
   ctx = canvas.getContext("2d"),
   spriteSheet = new Image(),
+  // transformationMatrix = [1, 0, 0, 1, 0, 0],
 
   lastTime = null,
   windowWidth = 0, windowHeight = 0,
@@ -42,41 +45,21 @@ var canvas = document.getElementById("game_canvas"),
   doneLoading = false,
   fontLoaded = false,
   mousePos = null,
+  mouseClickedVec = null,
+  mouseClicked = false,
 
   sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT),
   spaceMap = new Space(SPACE_WIDTH, SPACE_HEIGHT),
   player = new Player(),
   planets = new Planets(),
-  monsters = new Monsters();
+  monsters = new Monsters(),
+  projectiles = new Projectiles();
 
 
 // Entry point & Event listeneners
 window.addEventListener('load', function () {
   init();
 }, false);
-
-// Load assets etc
-spriteSheet.addEventListener('load', function () {
-  console.log("Loaded " + SPRITESHEET_PATH);
-  doneLoading = true;
-}, false);
-
-// Inputs
-document.addEventListener('keydown', keyDownHandler, false);
-document.addEventListener('keyup', keyUpHandler, false);
-
-// Font
-document.addEventListener(
-  'png_font_loaded', function (e) {
-    console.log("png_font loaded !");
-    fontLoaded = true;
-  }
-);
-
-// Mouse
-document.addEventListener('mousemove', function (evt) {
-  mousePos = Utils.getMousePos(canvas, evt);
-});
 
 function init() {
   // https://stackoverflow.com/questions/3437786/get-the-size-of-the-screen-current-web-page-and-browser-window
@@ -88,19 +71,44 @@ function init() {
     y = w.innerHeight || e.clientHeight || g.clientHeight;
   windowWidth = x;
   windowHeight = y;
-
-  // TODO: https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da ??
-  // canvas.style.width = windowWidth + "px";
-  // canvas.style.height = windowHeight + "px";
-
   ctx.mozImageSmoothingEnabled = false;
   ctx.webkitImageSmoothingEnabled = false;
   ctx.msImageSmoothingEnabled = false;
   ctx.imageSmoothingEnabled = false;
 
-  //ctx.scale(CANVAS_SCALE, CANVAS_SCALE);
+  // Load assets etc
+  spriteSheet.addEventListener('load', function () {
+    console.log("Loaded " + SPRITESHEET_PATH);
+    doneLoading = true;
+  }, false);
 
-  // Initialisation
+  // Inputs
+  document.addEventListener('keydown', keyDownHandler, false);
+  document.addEventListener('keyup', keyUpHandler, false);
+
+  // Font
+  document.addEventListener(
+    'png_font_loaded', function (e) {
+      console.log("png_font loaded !");
+      fontLoaded = true;
+    }
+  );
+
+  // Mouse
+  canvas.addEventListener('mousemove', function (evt) {
+    mousePos = Utils.getMousePos(canvas, evt);
+  });
+
+  canvas.addEventListener('click', function (evt) {
+    //var x = evt.pageX, y = evt.pageY;
+    // var x = evt.clientX - canvas.offsetLeft;
+    // var y = evt.clientY - canvas.offsetTop;
+    //mouseClickedVec = getTransformatedMouseCoords(x, y);
+    var pos = Utils.getMousePos(canvas, evt);
+    mouseClickedVec = {x: pos.x, y: pos.y};
+    mouseClicked = true;
+  });
+
   spaceMap.init();
   player.sprite.setPos({x: GAME_AREA_PIXEL_WIDTH / 2, y: GAME_AREA_PIXEL_HEIGHT / 2});
 
@@ -128,14 +136,25 @@ function tick() {
 }
 
 function update(delta) {
-  var pixPerSec = 50;
-  var sp = sprite.getPos();
-  if (sp.x * CANVAS_SCALE >= GAME_AREA_PIXEL_WIDTH_SCALED) sprite.x = 0;
-  if (sp.y * CANVAS_SCALE >= GAME_AREA_PIXEL_HEIGHT_SCALED) sprite.y = 0;
-  sprite.setPos({x: sprite.getPos().x + pixPerSec * delta, y: sprite.getPos().y + pixPerSec * delta});
+  switch (currentState) {
+    case GAMESTATE_INGAME: {
+      var pixPerSec = 50;
+      var sp = sprite.getPos();
+      if (sp.x * CANVAS_SCALE >= GAME_AREA_PIXEL_WIDTH_SCALED) sprite.x = 0;
+      if (sp.y * CANVAS_SCALE >= GAME_AREA_PIXEL_HEIGHT_SCALED) sprite.y = 0;
+      sprite.setPos({x: sprite.getPos().x + pixPerSec * delta, y: sprite.getPos().y + pixPerSec * delta});
 
-  monsters.update(delta);
-  player.update(delta);
+      if (mouseClicked && mouseClickedVec) {
+        player.attack(mouseClickedVec);
+        mouseClicked = false;
+      }
+
+      monsters.update(delta);
+      player.update(delta);
+      projectiles.update(delta);
+    }
+      break;
+  }
 }
 
 function render() {
@@ -143,7 +162,6 @@ function render() {
 
   switch (currentState) {
     case GAMESTATE_INGAME:
-      //ctx.save();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       var px = player.sprite.x;//*CANVAS_SCALE;
@@ -158,32 +176,47 @@ function render() {
       monsters.render();
       sprite.render();
       player.render();
+      projectiles.render();
 
-      //ctx.restore();
       ctx.setTransform(1, 0, 0, 1, 0, 0); // faster??
 
       if (fontLoaded) {
-        // png_font.drawText("hello world!", [32, 32]);
-        // png_font.drawText("한국어!", [48, 64], "#559");
-        // png_font.drawText("日本語!", [64, 96], "red", 2);
-        // png_font.drawText("Café", [160, 40], 'orange', 4, 'blue');
-        png_font.drawText("Planets remaining: " + planets.getRemaining(), [10, canvas.height-40], "lightblue", 2, "blue");
+        png_font.drawText("Planets remaining: " + planets.getRemaining(), [10, canvas.height - 40], "lightblue", 2, "blue");
         // for (var i=0;i<planets.getRemaining(); i++) {
         //   var p = planets.getPlanet(i);
         //   if (p) png_font.drawText("Health: " + p.health, [p.origin.x, p.origin.y-16], "red", 1);
         // }
-        // try {
-        //   png_font.drawText("MousePos: " + mousePos.x + "," + mousePos.y, [5, 0], "lightblue", 2, "blue");
-        //   png_font.drawText("Translated MousePos: " + ((mousePos.x - canvas.width * 0.5)/CANVAS_SCALE) + "," + ((mousePos.y - canvas.height * 0.5)/CANVAS_SCALE), [5, 22], "lightblue", 2, "blue");
-        // } catch (ex) {}
+        try {
+          png_font.drawText("MousePos: " + mousePos.x + "," + mousePos.y, [5, 0], "lightblue", 2, "blue");
+        } catch (ex) {
+        }
       }
-
       break;
 
     default:
       break;
   }
 }
+
+// function translate(x, y) {
+//   transformationMatrix[4] += transformationMatrix[0] * x + transformationMatrix[2] * y;
+//   transformationMatrix[5] += transformationMatrix[1] * x + transformationMatrix[3] * y;
+//   ctx.translate(x, y);
+// }
+//
+// function scale(x, y) {
+//   transformationMatrix[0] *= x;
+//   transformationMatrix[1] *= x;
+//   transformationMatrix[2] *= y;
+//   transformationMatrix[3] *= y;
+//   ctx.scale(x, y);
+// }
+//
+// function getTransformatedMouseCoords(mouseX, mouseY) {
+//   newX = mouseX * transformationMatrix[0] + mouseY * transformationMatrix[2] + transformationMatrix[4];
+//   newY = mouseX * transformationMatrix[1] + mouseY * transformationMatrix[3] + transformationMatrix[5];
+//   return ({x: newX, y: newY});
+// }
 
 // Retarded
 function keyDownHandler(event) {
