@@ -43,7 +43,8 @@ var canvas = document.getElementById("game_canvas"),
 
   sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT),
   spaceMap = new Space(SPACE_WIDTH, SPACE_HEIGHT),
-  player = new Player();
+  player = new Player(),
+  planets = new Planets();
 
 
 // Entry point & Event listeneners
@@ -86,10 +87,6 @@ function init() {
 
   // Initialisation
   spaceMap.init();
-  // player.sprite.setPos({
-  //     x: ((canvas.width/2)-player.sprite.width/2)/CANVAS_SCALE,
-  //     y: ((canvas.height/2)-player.sprite.height/2)/CANVAS_SCALE
-  //   });
   player.sprite.setPos({x: GAME_AREA_PIXEL_WIDTH/2, y: GAME_AREA_PIXEL_HEIGHT/2});
 
   // Loading
@@ -142,6 +139,7 @@ function render() {
       ctx.scale(CANVAS_SCALE, CANVAS_SCALE);
 
       spaceMap.render();
+      planets.render();
       sprite.render();
       player.render();
 
