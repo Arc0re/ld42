@@ -47,6 +47,7 @@ const
   KEYBOARD_SHOOTLEFT = 'ArrowLeft',
   KEYBOARD_SHOOTRIGHT = 'ArrowRight',
   KEYBOARD_ENTER = 'Enter',
+  KEYBOARD_SHIFTLEFT = 'ShiftLeft',
 
   // Mapping starts from 0 cuz we don't wanna loop until 39 for nothing
   RIGHT_KEY = 0,
@@ -58,6 +59,7 @@ const
   SHOOT_UP_KEY = 6,
   SHOOT_DOWN_KEY = 7,
   ENTER_KEY = 8,
+  SHIFT_LEFT = 9,
 
   DEBUG_SHOW_COLLISION_BOXES = false;
 
@@ -212,6 +214,11 @@ function update(delta) {
         currentState = GAMESTATE_PAUSE;
         SOUND_MANAGER.play("pause");
       }
+      if (keysDown[SHIFT_LEFT]) {
+        player.pixPerFrame = Player.HELD_SPEED;
+      } else if (!keysDown[SHIFT_LEFT]) {
+        player.pixPerFrame = Player.NORMAL_SPEED;
+      }
     } break;
 
     case GAMESTATE_PAUSE: {
@@ -247,9 +254,10 @@ function render() {
         png_font.drawText("The Galaxy needs you!", [CANVAS_WIDTH/2-160, CANVAS_HEIGHT/2+60], "red", 2,"blue");
         png_font.drawText("Destroy all the aliens, save the planets!", [70, CANVAS_HEIGHT/2+90], "red", 2,"blue");
 
-        png_font.drawText("[ WASD   ]: Move Ship", [110, CANVAS_HEIGHT/2+150], 'grey', 2, 'blue');
-        png_font.drawText("[ Arrows ]: Fire", [110, CANVAS_HEIGHT/2+180], 'grey', 2, 'blue');
-        png_font.drawText("[ Enter  ]: Pause", [110, CANVAS_HEIGHT/2+210], 'grey', 2, 'blue');
+        png_font.drawText("[ WASD   ]: Move Ship", [110, CANVAS_HEIGHT/2+140-4], 'grey', 2, 'blue');
+        png_font.drawText("[ Arrows ]: Fire", [110, CANVAS_HEIGHT/2+170-4], 'grey', 2, 'blue');
+        png_font.drawText("[ Enter  ]: Pause", [110, CANVAS_HEIGHT/2+200-4], 'grey', 2, 'blue');
+        png_font.drawText("[ Shift  ]: Precision Mode", [110, CANVAS_HEIGHT/2+230-4], 'grey', 2, 'blue');
 
         png_font.drawText("2018 - LD42Compo - github.com/Arc0re", [110, CANVAS_HEIGHT-40], 'darkgrey', 2, 'blue');
       }
@@ -357,6 +365,9 @@ function keyDownHandler(event) {
     case KEYBOARD_ENTER:
       keysDown[ENTER_KEY] = true;
       break;
+    case KEYBOARD_SHIFTLEFT:
+      keysDown[SHIFT_LEFT] = true;
+      break;
   }
 }
 
@@ -388,6 +399,9 @@ function keyUpHandler(event) {
       break;
     case KEYBOARD_ENTER:
       keysDown[ENTER_KEY] = false;
+      break;
+    case KEYBOARD_SHIFTLEFT:
+      keysDown[SHIFT_LEFT] = false;
       break;
   }
 }

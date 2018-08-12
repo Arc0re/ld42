@@ -39,15 +39,23 @@ class ScoreManager {
 
 class Player {
   constructor() {
-    this.sprite = new Sprite(3, 26, BLOCK_WIDTH, BLOCK_HEIGHT, "player_sprite");
+    this.sprite = new Sprite(3, 36, BLOCK_WIDTH, BLOCK_HEIGHT, "player_sprite");
     this.sprite.setPos({x: 0, y: 0});
-    this.pixPerFrame = 250;
+    this.pixPerFrame = Player.NORMAL_SPEED;
     this.projectileType = PROJ_BLUEBALL;
     this.attackCoolDown = PROJECTILE_DATA[this.projectileType].coolDownMs;
     this.scoreManager = new ScoreManager(this);
     this.lastAttackTime = 0;
     this.health = 500;
     this.dead = false;
+  }
+
+  static get NORMAL_SPEED() {
+    return 350;
+  }
+
+  static get HELD_SPEED() {
+    return 150;
   }
 
   getRectangle() {

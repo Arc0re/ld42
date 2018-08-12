@@ -76,7 +76,7 @@ class Planet {
     }
 
     const p = this.origin;
-    if (fontLoaded) png_font.drawText(this.health.toString(), [p.x+7,p.y-20], "red", 1, "blue");
+    if (fontLoaded) png_font.drawText(this.health.toString(), [p.x+(Math.floor(this.width*2.6))/2,p.y-20], "red", 1, "blue");
 
     if (DEBUG_SHOW_COLLISION_BOXES) {
       this.getRectangle().drawCollisionBox();
