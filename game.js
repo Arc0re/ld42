@@ -6,7 +6,10 @@ const
   CANVAS_HEIGHT = 600,
   SOUND_MANAGER = new SoundManager([
     "snd/proj_blue_ball.wav",
-    "snd/proj_green_ball.wav"
+    "snd/proj_green_ball.wav",
+    "snd/powerup.wav",
+    "snd/hit.wav",
+    "snd/powerdown.wav"
   ], onSoundManagerLoadingComplete),
 
   BLOCK_WIDTH = 8,
@@ -133,10 +136,6 @@ function init() {
 function onSoundManagerLoadingComplete(list) {
   console.log("Sound loading complete!", list);
   soundsLoaded = true;
-
-  var source = SOUND_MANAGER.context.createBufferSource();
-  source.buffer = list[0];
-  source.start(0);
 }
 
 function tick() {

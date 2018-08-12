@@ -8,7 +8,7 @@ class SoundManager {
     this.loadCount = 0; // when its done, callback
   }
 
-  loadBufferAsync(url, index) {
+  loadBufferAsync(url, index, name) {
     var _this = this;
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
@@ -23,9 +23,8 @@ class SoundManager {
               console.log("Error while decoding audio data: " + url);
               return;
             }
-            _this.buffers[index] = buffer;
-            // _this.buffers.push(buffer);
-
+            //_this.buffers[index] = buffer;
+            _this.buffers[index] = {buffer: buffer, name: name, index: index};
             if (++_this.loadCount === _this.soundUrls.length) _this.onCompleteCallback(_this.buffers);
           },
           function (error) {
@@ -46,13 +45,16 @@ class SoundManager {
   loadAllSounds() {
     for (var i=0; i<this.soundUrls.length; i++) {
       var url = this.soundUrls[i];
-      this.loadBufferAsync(url, i);
+      var name = url.split('/')[1].replace('.wav', '');
+      this.loadBufferAsync(url, i, name);
     }
   }
 
-  play(soundID) {
+  play(soundName) {
+    if (!soundsLoaded) return;
+    var data = this.buffers.find(obj => { return obj.name === soundName; });
     var source = this.context.createBufferSource();
-    source.buffer = this.buffers[soundID];
+    source.buffer = data.buffer;//this.buffers[soundID];
     source.connect(this.context.destination);
     source.start(0);
   }
