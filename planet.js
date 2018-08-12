@@ -74,7 +74,7 @@ class Planet {
         }
       }
     }
-    if (fontLoaded) png_font.drawText("Café",[160,40],'orange',4,'blue');
+
     const p = this.origin;
     if (fontLoaded) png_font.drawText("Health: " + this.health, [p.x-20,p.y-20], "red", 1, "blue");
   }

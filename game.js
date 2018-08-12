@@ -20,6 +20,7 @@ const
 
   GAMESTATE_MENU = 0,
   GAMESTATE_INGAME = 1,
+  GAMESTATE_GAMEOVER = 2,
   GAMESTATE_NONE = 99,
 
   KEYBOARD_UP = 69,
@@ -55,6 +56,7 @@ var canvas = document.getElementById("game_canvas"),
   mousePos = null,
   mouseClickedVec = null,
   mouseClicked = false,
+  score = 0,
 
   sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT),
   spaceMap = new Space(SPACE_WIDTH, SPACE_HEIGHT),
@@ -152,17 +154,21 @@ function update(delta) {
       if (sp.y * CANVAS_SCALE >= GAME_AREA_PIXEL_HEIGHT_SCALED) sprite.y = 0;
       sprite.setPos({x: sprite.getPos().x + pixPerSec * delta, y: sprite.getPos().y + pixPerSec * delta});
 
-      // if (mouseClicked && mouseClickedVec) {
-      //   player.attack(mouseClickedVec);
-      //   mouseClicked = false;
-      // }
-
       monsters.update(delta);
       planets.update(delta);
       player.update(delta);
       projectiles.update(delta);
-    }
-      break;
+
+      if (planets.getRemaining() <= 0) {
+        currentState = GAMESTATE_GAMEOVER;
+      }
+    } break;
+
+    case GAMESTATE_MENU: {
+    } break;
+
+    case GAMESTATE_GAMEOVER: {
+    } break;
   }
 }
 
@@ -191,47 +197,25 @@ function render() {
 
       if (fontLoaded) {
         png_font.drawText("Planets remaining: " + planets.getRemaining(), [10, canvas.height - 40], "lightblue", 2, "blue");
-        // for (var i=0;i<planets.getRemaining(); i++) {
-        //   var p = planets.getPlanet(i);
-        //   if (p) {
-        //     var pos = p.getTranslatedOrigin();
-        //     try {
-        //       png_font.drawText("Health: " + p.health, [pos.x, pos.y], "red", 1, "blue");
-        //     } catch (ex) {
-        //     }
-        //   }
-        //}
         try {
           png_font.drawText("MousePos: " + mousePos.x + "," + mousePos.y, [5, 0], "lightblue", 2, "blue");
         } catch (ex) {
         }
       }
       break;
+    case GAMESTATE_GAMEOVER: {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (fontLoaded) {
+        //png_font.drawText("Café",[160,40],'orange',4,'blue');
+        png_font.drawText("GAME OVER",[CANVAS_WIDTH/2-140, CANVAS_HEIGHT/2-140],'red',8,'purple');
+        png_font.drawText("Score: " + score, [CANVAS_WIDTH/2-300, CANVAS_HEIGHT/2+140], 'darkblue', 3, 'blue');
+      }
+    } break;
 
     default:
       break;
   }
 }
-
-// function translate(x, y) {
-//   transformationMatrix[4] += transformationMatrix[0] * x + transformationMatrix[2] * y;
-//   transformationMatrix[5] += transformationMatrix[1] * x + transformationMatrix[3] * y;
-//   ctx.translate(x, y);
-// }
-//
-// function scale(x, y) {
-//   transformationMatrix[0] *= x;
-//   transformationMatrix[1] *= x;
-//   transformationMatrix[2] *= y;
-//   transformationMatrix[3] *= y;
-//   ctx.scale(x, y);
-// }
-//
-// function getTransformatedMouseCoords(mouseX, mouseY) {
-//   newX = mouseX * transformationMatrix[0] + mouseY * transformationMatrix[2] + transformationMatrix[4];
-//   newY = mouseX * transformationMatrix[1] + mouseY * transformationMatrix[3] + transformationMatrix[5];
-//   return ({x: newX, y: newY});
-// }
 
 // Retarded
 function keyDownHandler(event) {
