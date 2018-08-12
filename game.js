@@ -4,6 +4,9 @@ const
   CANVAS_SCALE = 4,
   CANVAS_WIDTH = 800,
   CANVAS_HEIGHT = 600,
+  SOUND_MANAGER = new SoundManager([
+    "snd/Laser_Shoot.wav"
+  ], onSoundManagerLoadingComplete),
 
   BLOCK_WIDTH = 8,
   BLOCK_HEIGHT = 8,
@@ -47,7 +50,6 @@ const
 var canvas = document.getElementById("game_canvas"),
   ctx = canvas.getContext("2d"),
   spriteSheet = new Image(),
-  // transformationMatrix = [1, 0, 0, 1, 0, 0],
 
   lastTime = null,
   windowWidth = 0, windowHeight = 0,
@@ -55,6 +57,7 @@ var canvas = document.getElementById("game_canvas"),
   keysDown = [],
   doneLoading = false,
   fontLoaded = false,
+  soundsLoaded = false,
 
   sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT),
   spaceMap = new Space(SPACE_WIDTH, SPACE_HEIGHT),
@@ -90,9 +93,16 @@ function init() {
     doneLoading = true;
   }, false);
 
+
   // Inputs
   document.addEventListener('keydown', keyDownHandler, false);
   document.addEventListener('keyup', keyUpHandler, false);
+  document.addEventListener('click', function (event) {
+    SOUND_MANAGER.context.resume().then(() => {
+      console.log("Resumed SOUND_MANAGER");
+      SOUND_MANAGER.loadAllSounds();
+    });
+  });
 
   // Font
   document.addEventListener(
@@ -105,9 +115,6 @@ function init() {
   spaceMap.init();
   player.sprite.setPos({x: GAME_AREA_PIXEL_WIDTH / 2, y: GAME_AREA_PIXEL_HEIGHT / 2});
 
-  soundTest = new Audio("snd/Laser_Shoot.wav");
-  soundTest.playbackRate = 2;
-
   // Loading
   spriteSheet.src = SPRITESHEET_PATH;
   png_font.setup(
@@ -118,6 +125,13 @@ function init() {
   lastTime = Date.now();
   currentState = GAMESTATE_INGAME;
   tick();
+}
+
+function onSoundManagerLoadingComplete(list) {
+  console.log(list);
+  console.log("Sound loading complete!");
+  soundsLoaded = true;
+  SOUND_MANAGER.buffers = list;
 }
 
 function tick() {

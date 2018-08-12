@@ -40,6 +40,7 @@ class Player {
   }
 
   attack(targetVec) {
+    SOUND_MANAGER.play("Laser_Shoot");
     var projectile = new Projectile(this.projectileType);
     projectile.fire({x: this.sprite.x+((this.sprite.width/2)-projectile.sprite.width/2)*CANVAS_SCALE, y: this.sprite.y+((this.sprite.height/2)-projectile.sprite.height/2)*CANVAS_SCALE}, targetVec);
   }
