@@ -13,7 +13,7 @@ class SoundManager {
     this.loadCount = 0; // when its done, callback
   }
 
-  loadBufferAsync(url, index, nafedfme) {
+  loadBufferAsync(url, index, name) {
     var _this = this;
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
