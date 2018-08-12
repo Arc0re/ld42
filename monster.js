@@ -4,22 +4,27 @@ class Monster {
     switch (rnd) {
       case 0:
       default:
-      this.sprite = new Sprite(86, 4, BLOCK_WIDTH, BLOCK_HEIGHT, name);
+        this.sprite = new Sprite(86, 4, BLOCK_WIDTH, BLOCK_HEIGHT, name);
         break;
     }
     this.name = name;
     this.spawnPoint = spawnPoint;
     this.health = health;
-    this.attack = attack;
+    this.attackPoints = attack;
     this.sprite.setPos({x: spawnPoint.x, y: spawnPoint.y});
     this.targetPlanet = null;
     this.targetData = null;
     this.speed = Utils.randInt(5, 20);
     this.isMoving = false;
+    this.attackTimeout = 3000;
+  }
+
+  getRectangle() {
+    return new Rectangle(Math.floor(this.sprite.x), Math.floor(this.sprite.y), this.sprite.width, this.sprite.height);
   }
 
   update(delta) {
-    if (this.targetPlanet === null || this.targetPlanet.health<=0) {
+    if (this.targetPlanet === null || this.targetPlanet.health <= 0) {
       // Pick a planet to attack and go towards it until its dead
       var chosenOne = planets.getPlanet(Utils.randInt(0, planets.getRemaining()));
       if (chosenOne) {
@@ -41,6 +46,7 @@ class Monster {
         if (Utils.vector.dist(this.targetData.start, this.sprite.getPos()) >= this.targetData.distance) {
           this.sprite.setPos(this.targetData.end);
           this.isMoving = false;
+          this.attack();
         }
       }
     }
@@ -50,8 +56,16 @@ class Monster {
     this.sprite.render();
   }
 
-  attack(vec) {
-    // TODO: fire ball in (vec.x, vec.y) ?
-    console.log("Mon " + this.name + " attacking towards (x: " + vec.x + ", y: " + vec.y + " with an attack of " + this.attack);
+  attack() {
+    if (this.targetPlanet && !this.targetPlanet.destroyed) {
+      // Attack every x second until the planet is dead
+      var self = this;
+      var done = window.setInterval(function () {
+        self.targetPlanet.health -= self.attackPoints;
+      }, this.attackTimeout);
+      if (done && this.targetPlanet.health <= 0) {
+        window.clearInterval(done);
+      }
+    }
   }
 }
