@@ -11,6 +11,7 @@ class Monsters {
       var att = Utils.randInt(5, 20);
 
       this.monsters.push(new Monster("Monster #" + m, {x: x, y: y}, hp, att));
+      this.monsters[this.monsters.length-1].sprite.setupAnimationFrames(2);
     }
   }
 

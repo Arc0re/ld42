@@ -7,6 +7,11 @@ class Sprite {
     this.name = name;
     this.x = 0;
     this.y = 0;
+    this.animated = false;
+    this.animationFrames = 0;
+    this.currentFrame = 0;
+    this.startingSrcX = srcX;
+    this.timesFrame = [];
   }
 
   static makeProjectileSprite(projectileData) {
@@ -20,6 +25,30 @@ class Sprite {
 
   getPos() {
     return {x: this.x, y: this.y};
+  }
+
+  setupAnimationFrames(numFrames) {
+    this.animated = true;
+    this.animationFrames = numFrames;
+    for (var i=0; i<numFrames; i++) {
+      this.timesFrame[i] = 1;
+    }
+  }
+
+  update(delta) {
+    const TIME_BETWEEN_FRAMES = 10;
+    if (this.animated && this.animationFrames>0) {
+      this.currentFrame++;
+      this.timesFrame[this.currentFrame]++;
+      if (this.currentFrame>=this.animationFrames) {
+        this.currentFrame = 0;
+        this.srcX = this.startingSrcX;
+      }
+      if (this.timesFrame[this.currentFrame]>TIME_BETWEEN_FRAMES) {
+        this.srcX += (this.currentFrame*this.width+1);
+        this.timesFrame[this.currentFrame] = 1;
+      }
+    }
   }
 
   render() {

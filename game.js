@@ -122,6 +122,9 @@ function init() {
   spaceMap.init();
   player.sprite.setPos({x: GAME_AREA_PIXEL_WIDTH / 2, y: GAME_AREA_PIXEL_HEIGHT / 2});
 
+  testAnimatedSprite = new Sprite(86, 4, BLOCK_WIDTH, BLOCK_HEIGHT, "test_animation_frames");
+  testAnimatedSprite.setupAnimationFrames(2);
+
   // Loading
   spriteSheet.src = SPRITESHEET_PATH;
   png_font.setup(
@@ -158,6 +161,7 @@ function update(delta) {
       planets.update(delta);
       player.update(delta);
       projectiles.update(delta);
+      testAnimatedSprite.update(delta);
 
       if (planets.getRemaining() <= 0) {
         currentState = GAMESTATE_GAMEOVER;
@@ -192,6 +196,7 @@ function render() {
       sprite.render();
       player.render();
       projectiles.render();
+      testAnimatedSprite.render();
 
       ctx.setTransform(1, 0, 0, 1, 0, 0); // faster??
 

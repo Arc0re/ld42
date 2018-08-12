@@ -50,6 +50,7 @@ class Monster {
         }
       }
     }
+    this.sprite.update(delta);
   }
 
   render() {
