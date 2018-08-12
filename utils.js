@@ -33,6 +33,11 @@ var Utils = {
     normalize(vec) {
       return {x: vec.x/this.len(vec), y: vec.y/this.len(vec)}
     }
+  },
+  blink: function (frequency, callback) {
+    if (Math.floor(Date.now() / frequency) % 2) {
+      callback();
+    }
   }
 };
 

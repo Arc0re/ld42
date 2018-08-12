@@ -56,11 +56,15 @@ class SoundManager {
   }
 
   play(soundName) {
-    if (!soundsLoaded) return;
-    var data = this.buffers.find(obj => { return obj.name === soundName; });
-    var source = this.context.createBufferSource();
-    source.buffer = data.buffer;
-    source.connect(this.gainNode);
-    source.start(0);
+    try {
+      if (!soundsLoaded) return;
+      var data = this.buffers.find(obj => { return obj.name === soundName; });
+      var source = this.context.createBufferSource();
+      source.buffer = data.buffer;
+      source.connect(this.gainNode);
+      source.start(0);
+    } catch (ex) {
+      console.log("Failed to play sound called", soundName, ex);
+    }
   }
 }

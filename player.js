@@ -10,6 +10,8 @@ class ScoreManager {
 
   rewardForKilling(alien) {
     this.score += alien.awardedPoints;
+    highScore += alien.awardedPoints;
+    alienKilledCount++;
     this.applyPowerup();
     SOUND_MANAGER.play("hit");
   }
@@ -44,9 +46,20 @@ class Player {
     this.attackCoolDown = PROJECTILE_DATA[this.projectileType].coolDownMs;
     this.scoreManager = new ScoreManager(this);
     this.lastAttackTime = 0;
+    this.health = 500;
+    this.dead = false;
+  }
+
+  getRectangle() {
+    return this.sprite.getRectangle();
   }
 
   update(delta) {
+    if (this.health <= 0) {
+      this.dead = true;
+      return;
+    }
+
     var p = this.pixPerFrame;
     if (keysDown[LEFT_KEY]) this.sprite.x -= p*delta;
     if (keysDown[RIGHT_KEY]) this.sprite.x += p*delta;
@@ -56,6 +69,20 @@ class Player {
     if (keysDown[SHOOT_RIGHT_KEY]) this.attack({x: this.sprite.x*10, y: this.sprite.y});
     if (keysDown[SHOOT_UP_KEY]) this.attack({x: this.sprite.x, y: -this.sprite.y});
     if (keysDown[SHOOT_DOWN_KEY]) this.attack({x: this.sprite.x, y: this.sprite.y*10});
+
+    // Collisions
+    for (var m=0; m<monsters.getRemaining(); m++) {
+      var alien = monsters.getMonster(m);
+      if (alien) {
+        if (this.getRectangle().intersects(alien.getRectangle())) {
+          this.health -= alien.attackPoints;
+          SOUND_MANAGER.play("hit_player");
+          let rndX = Utils.randInt(-20, 20);
+          let rndY = Utils.randInt(-20, 20);
+          this.sprite.setPos(Utils.vector.add(this.sprite.getPos(), {x: rndX, y: rndY}));
+        }
+      }
+    }
   }
 
   attack(targetVec) {

@@ -10,7 +10,9 @@ const
     "snd/powerup.wav",
     "snd/hit.wav",
     "snd/powerdown.wav",
-    "snd/ouch.wav"
+    "snd/ouch.wav",
+    "snd/hit_player.wav",
+    "snd/proj_redbeam2.wav"
   ], onSoundManagerLoadingComplete),
 
   BLOCK_WIDTH = 8,
@@ -29,16 +31,18 @@ const
   GAMESTATE_MENU = 0,
   GAMESTATE_INGAME = 1,
   GAMESTATE_GAMEOVER = 2,
+  GAMESTATE_VICTORY = 3,
   GAMESTATE_NONE = 99,
 
-  KEYBOARD_UP = 69,
-  KEYBOARD_DOWN = 68,
-  KEYBOARD_LEFT = 83,
-  KEYBOARD_RIGHT = 70,
-  KEYBOARD_SHOOTUP = 38,
-  KEYBOARD_SHOOTDOWN = 40,
-  KEYBOARD_SHOOTLEFT = 37,
-  KEYBOARD_SHOOTRIGHT = 39,
+  KEYBOARD_UP = 'KeyW',
+  KEYBOARD_DOWN = 'KeyS',
+  KEYBOARD_LEFT = 'KeyA',
+  KEYBOARD_RIGHT = 'KeyD',
+  KEYBOARD_SHOOTUP = 'ArrowUp',
+  KEYBOARD_SHOOTDOWN = 'ArrowDown',
+  KEYBOARD_SHOOTLEFT = 'ArrowLeft',
+  KEYBOARD_SHOOTRIGHT = 'ArrowRight',
+  KEYBOARD_ENTER = 'Enter',
 
   // Mapping starts from 0 cuz we don't wanna loop until 39 for nothing
   RIGHT_KEY = 0,
@@ -49,6 +53,7 @@ const
   SHOOT_LEFT_KEY = 5,
   SHOOT_UP_KEY = 6,
   SHOOT_DOWN_KEY = 7,
+  ENTER_KEY = 8,
 
   DEBUG_SHOW_COLLISION_BOXES = false;
 
@@ -59,10 +64,13 @@ var canvas = document.getElementById("game_canvas"),
   lastTime = null,
   windowWidth = 0, windowHeight = 0,
   currentState = GAMESTATE_NONE,
+  startingState = GAMESTATE_VICTORY,
   keysDown = [],
   doneLoading = false,
   fontLoaded = false,
   soundsLoaded = false,
+  highScore = 0,
+  alienKilledCount = 0,
 
   sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT),
   spaceMap = new Space(SPACE_WIDTH, SPACE_HEIGHT),
@@ -130,8 +138,21 @@ function init() {
   );
 
   lastTime = Date.now();
-  currentState = GAMESTATE_INGAME;
+  currentState = startingState;
   tick();
+}
+
+function restart() {
+  highScore = 0;
+  alienKilledCount = 0;
+  sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT);
+  spaceMap = new Space(SPACE_WIDTH, SPACE_HEIGHT);
+  player = new Player();
+  planets = new Planets();
+  monsters = new Monsters();
+  projectiles = new Projectiles();
+  spaceMap.init();
+  player.sprite.setPos({x: GAME_AREA_PIXEL_WIDTH / 2, y: GAME_AREA_PIXEL_HEIGHT / 2});
 }
 
 function onSoundManagerLoadingComplete(list) {
@@ -167,12 +188,23 @@ function update(delta) {
       if (planets.getRemaining() <= 0) {
         currentState = GAMESTATE_GAMEOVER;
       }
+      if (player.dead) {
+        currentState = GAMESTATE_GAMEOVER;
+      }
+      if (monsters.getRemaining() <= 0 && planets.getRemaining() > 0) {
+        currentState = GAMESTATE_VICTORY;
+      }
     } break;
 
     case GAMESTATE_MENU: {
     } break;
 
-    case GAMESTATE_GAMEOVER: {
+    case GAMESTATE_GAMEOVER:
+    case GAMESTATE_VICTORY: {
+      if (keysDown[ENTER_KEY]) {
+        currentState = GAMESTATE_INGAME;
+        restart();
+      }
     } break;
   }
 }
@@ -202,15 +234,32 @@ function render() {
 
       if (fontLoaded) {
         png_font.drawText("Planets remaining: " + planets.getRemaining(), [10, canvas.height - 40], "lightblue", 2, "blue");
-        png_font.drawText("Score: " + player.scoreManager.getScore(), [canvas.width-200, canvas.height - 40], "lightblue", 2, "blue");
+        png_font.drawText(player.scoreManager.getScore().toString(), [5, 0], "lightblue", 2, "blue");
+        png_font.drawText("HIGH SCORE", [(canvas.width/2)-90, 0], "red", 2, "darkred");
+        png_font.drawText(highScore.toString(), [(canvas.width/2)-30, 30], "white", 2, "black");
+        if (!soundsLoaded) {
+          Utils.blink(500, function () {
+            png_font.drawText("**CLICK FOR SOUND**", [canvas.width/2+50, canvas.height - 40], "white", 2, "black");
+          });
+        }
       }
       break;
+
     case GAMESTATE_GAMEOVER: {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       if (fontLoaded) {
-        //png_font.drawText("Café",[160,40],'orange',4,'blue');
-        png_font.drawText("GAME OVER",[CANVAS_WIDTH/2-140, CANVAS_HEIGHT/2-140],'red',8,'purple');
-        png_font.drawText("Score: " + player.scoreManager.getScore(), [CANVAS_WIDTH/2-300, CANVAS_HEIGHT/2+140], 'darkblue', 3, 'blue');
+        png_font.drawText("GAME OVER",[CANVAS_WIDTH/2-140, CANVAS_HEIGHT/2-300],'red',8,'purple');
+        displayHighScoreEtc();
+      }
+    } break;
+
+    case GAMESTATE_VICTORY: {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (fontLoaded) {
+        png_font.drawText("VICTORY",[CANVAS_WIDTH/2-120,40],'orange',4,'blue');
+        png_font.drawText("The Galaxy is now at peace...",[CANVAS_WIDTH/2-220,150],'white',2,'blue');
+        png_font.drawText("But for how long...?",[CANVAS_WIDTH/2-150,200],'white',2,'blue');
+        displayHighScoreEtc();
       }
     } break;
 
@@ -219,9 +268,20 @@ function render() {
   }
 }
 
+function displayHighScoreEtc() {
+  Utils.blink(500, function () {
+    png_font.drawText("PRESS ENTER TO RESTART", [CANVAS_WIDTH/2-270, CANVAS_HEIGHT/2-40], 'orange', 3, 'blue');
+  });
+  png_font.drawText("*HIGH SCORE*", [CANVAS_WIDTH/2-150, CANVAS_HEIGHT/2+20], 'red', 3, 'purple');
+  png_font.drawText(highScore.toString(), [CANVAS_WIDTH/2-30, CANVAS_HEIGHT/2+70], 'white', 2, 'black');
+  png_font.drawText("Final Score: " + player.scoreManager.getScore(), [CANVAS_WIDTH/2-150, CANVAS_HEIGHT/2+140], 'lightblue', 2, 'blue');
+  png_font.drawText("Saved Worlds: " + planets.getRemaining(), [CANVAS_WIDTH/2-150, CANVAS_HEIGHT/2+180], 'lightblue', 2, 'blue');
+  png_font.drawText("Exterminated Aliens: " + alienKilledCount, [CANVAS_WIDTH/2-150, CANVAS_HEIGHT/2+220], 'lightblue', 2, 'blue');
+};
+
 // Retarded
 function keyDownHandler(event) {
-  switch (event.keyCode) {
+  switch (event.code) {
     case KEYBOARD_DOWN:
       keysDown[DOWN_KEY] = true;
       break;
@@ -246,11 +306,14 @@ function keyDownHandler(event) {
     case KEYBOARD_SHOOTRIGHT:
       keysDown[SHOOT_RIGHT_KEY] = true;
       break;
+    case KEYBOARD_ENTER:
+      keysDown[ENTER_KEY] = true;
+      break;
   }
 }
 
 function keyUpHandler(event) {
-  switch (event.keyCode) {
+  switch (event.code) {
     case KEYBOARD_DOWN:
       keysDown[DOWN_KEY] = false;
       break;
@@ -274,6 +337,9 @@ function keyUpHandler(event) {
       break;
     case KEYBOARD_SHOOTRIGHT:
       keysDown[SHOOT_RIGHT_KEY] = false;
+      break;
+    case KEYBOARD_ENTER:
+      keysDown[ENTER_KEY] = false;
       break;
   }
 }
