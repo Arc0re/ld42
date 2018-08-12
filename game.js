@@ -55,9 +55,6 @@ var canvas = document.getElementById("game_canvas"),
   keysDown = [],
   doneLoading = false,
   fontLoaded = false,
-  mousePos = null,
-  mouseClickedVec = null,
-  mouseClicked = false,
 
   sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT),
   spaceMap = new Space(SPACE_WIDTH, SPACE_HEIGHT),
@@ -105,26 +102,11 @@ function init() {
     }
   );
 
-  // Mouse
-  canvas.addEventListener('mousemove', function (evt) {
-    mousePos = Utils.getMousePos(canvas, evt);
-  });
-
-  canvas.addEventListener('click', function (evt) {
-    //var x = evt.pageX, y = evt.pageY;
-    // var x = evt.clientX - canvas.offsetLeft;
-    // var y = evt.clientY - canvas.offsetTop;
-    //mouseClickedVec = getTransformatedMouseCoords(x, y);
-    var pos = Utils.getMousePos(canvas, evt);
-    mouseClickedVec = {x: pos.x, y: pos.y};
-    mouseClicked = true;
-  });
-
   spaceMap.init();
   player.sprite.setPos({x: GAME_AREA_PIXEL_WIDTH / 2, y: GAME_AREA_PIXEL_HEIGHT / 2});
 
-  testAnimatedSprite = new Sprite(86, 4, BLOCK_WIDTH, BLOCK_HEIGHT, "test_animation_frames");
-  testAnimatedSprite.setupAnimationFrames(2);
+  soundTest = new Audio("snd/Laser_Shoot.wav");
+  soundTest.playbackRate = 2;
 
   // Loading
   spriteSheet.src = SPRITESHEET_PATH;
@@ -162,7 +144,6 @@ function update(delta) {
       planets.update(delta);
       player.update(delta);
       projectiles.update(delta);
-      testAnimatedSprite.update(delta);
 
       if (planets.getRemaining() <= 0) {
         currentState = GAMESTATE_GAMEOVER;
@@ -197,17 +178,12 @@ function render() {
       sprite.render();
       player.render();
       projectiles.render();
-      testAnimatedSprite.render();
 
       ctx.setTransform(1, 0, 0, 1, 0, 0); // faster??
 
       if (fontLoaded) {
         png_font.drawText("Planets remaining: " + planets.getRemaining(), [10, canvas.height - 40], "lightblue", 2, "blue");
         png_font.drawText("Score: " + player.scoreManager.getScore(), [canvas.width-200, canvas.height - 40], "lightblue", 2, "blue");
-        try {
-          png_font.drawText("MousePos: " + mousePos.x + "," + mousePos.y, [5, 0], "lightblue", 2, "blue");
-        } catch (ex) {
-        }
       }
       break;
     case GAMESTATE_GAMEOVER: {
