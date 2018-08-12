@@ -15,13 +15,15 @@ const
     "snd/proj_redbeam2.wav",
     "snd/explosion.wav",
     "snd/pause.wav",
-    "snd/start.wav"
+    "snd/start.wav",
+    "snd/proj_bigball.wav",
+    "snd/proj_star.wav"
   ], onSoundManagerLoadingComplete),
 
   BLOCK_WIDTH = 8,
   BLOCK_HEIGHT = 8,
-  SPACE_WIDTH = 80,
-  SPACE_HEIGHT = 80,
+  SPACE_WIDTH = 100,
+  SPACE_HEIGHT = 100,
   GAME_AREA_PIXEL_WIDTH = SPACE_WIDTH * BLOCK_WIDTH,
   GAME_AREA_PIXEL_HEIGHT = SPACE_HEIGHT * BLOCK_HEIGHT,
   GAME_AREA_PIXEL_WIDTH_SCALED = GAME_AREA_PIXEL_WIDTH * CANVAS_SCALE,

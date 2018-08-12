@@ -5,8 +5,8 @@ class Monsters {
     this.monsters = [];
 
     for (var m=0; m<MAX_MONSTERS; m++){
-      var x = Utils.randInt(0, canvas.width-BLOCK_WIDTH);
-      var y = Utils.randInt(0, canvas.height-BLOCK_HEIGHT);
+      var x = Utils.randInt(0, canvas.width - BLOCK_WIDTH);
+      var y = Utils.randInt(0, canvas.height - BLOCK_HEIGHT);
       var type = Utils.randInt(MON_BLUESNOWFLAKE, MON_GREENIE);
       this.monsters.push(new Monster(type, {x: x, y: y}));
     }
@@ -39,7 +39,7 @@ class Monsters {
   }
 
   render() {
-    for (var m = 0; m < MAX_MONSTERS; m++) {
+    for (var m=0; m<this.monsters.length; m++) {
       var mon = this.monsters[m];
       if (mon) {
         mon.render();
