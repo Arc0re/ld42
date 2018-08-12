@@ -3,7 +3,7 @@ const
   MON_PURPLELOSANGE = 1,
   MON_GREENIE = 2;
 
-const MONSTERSDATA = {
+const MONSTER_DATA = {
   [MON_BLUESNOWFLAKE]: { health: 50, attackPoints: 20, speed: 10, src: {x: 86, y: 4}, name: "alien_snowflake", animationFrames: 2, awardedPoints: 10 },
   [MON_PURPLELOSANGE]: { health: 70, attackPoints: 30, speed: 50, src: {x: 86, y: 13}, name: "alien_losange", animationFrames: 6, awardedPoints: 20 },
   [MON_GREENIE]: { health: 80, attackPoints: 10, speed: 10, src: {x: 86, y: 22}, name: "alien_insect", animationFrames: 3, awardedPoints: 30 },
@@ -11,7 +11,7 @@ const MONSTERSDATA = {
 
 class Monster {
   constructor(type, spawnPoint) {
-    var d = MONSTERSDATA[type];
+    var d = MONSTER_DATA[type];
     this.type = type;
     this.sprite = new Sprite(d.src.x, d.src.y, BLOCK_WIDTH, BLOCK_HEIGHT, d.name);
     this.sprite.setupAnimationFrames(d.animationFrames);

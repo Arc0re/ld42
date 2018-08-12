@@ -1,23 +1,23 @@
 const
   PROJ_BLUEBALL = 0,
   PROJ_GREENBALL = 1,
-  PROJ_NULL = -1
+  PROJ_NULL = -1,
   PROJECTILE_LIFESPAN = 2000;
 
-const PROJECTILES = {
-  [PROJ_BLUEBALL]: {src: {x: 54, y: 54}, size: 2, damage: 10, speed: 200, name: "proj_blue_ball"},
-  [PROJ_GREENBALL]: {src: {x: 54, y: 57}, size: 2, damage: 20, speed: 300, name: "proj_green_ball"}
+const PROJECTILE_DATA = {
+  [PROJ_BLUEBALL]: {src: {x: 54, y: 54}, size: 2, damage: 10, speed: 200, name: "proj_blue_ball", id: 0, coolDownMs: 500},
+  [PROJ_GREENBALL]: {src: {x: 54, y: 57}, size: 2, damage: 20, speed: 300, name: "proj_green_ball", id: 1, coolDownMs: 100}
 };
 
 class Projectile {
   constructor(type) {
-    this.sprite = Sprite.makeProjectileSprite(PROJECTILES[type]);
+    this.sprite = Sprite.makeProjectileSprite(PROJECTILE_DATA[type]);
     this.isMoving = false;
     this.targetData = null;
     this.arrived = false;
     this.markedForDeletion = false;
-    this.timeBeforeDeletion = null;
-    this.speed = PROJECTILES[type].speed;
+    this.speed = PROJECTILE_DATA[type].speed;
+    this.name = PROJECTILE_DATA[type].name;
     this.type = type;
   }
 
@@ -49,7 +49,7 @@ class Projectile {
         var planet = planets.getPlanet(p);
         if (planet) {
           if (this.getRectangle().intersects(planet.getRectangle())) {
-            planet.health -= PROJECTILES[this.type].damage;
+            planet.health -= PROJECTILE_DATA[this.type].damage;
             this.markedForDeletion = true;
             player.scoreManager.malus(planet.malusForFriendlyFire);
           }
@@ -59,7 +59,7 @@ class Projectile {
         var mon = monsters.getMonster(m);
         if (mon) {
           if (this.getRectangle().intersects(mon.getRectangle())) {
-            mon.health -= PROJECTILES[this.type].damage;
+            mon.health -= PROJECTILE_DATA[this.type].damage;
             this.markedForDeletion = true;
             if (mon.health<=0) player.scoreManager.rewardForKilling(mon);
             console.log("Player hit alien");

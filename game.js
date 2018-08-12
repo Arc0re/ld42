@@ -5,7 +5,8 @@ const
   CANVAS_WIDTH = 800,
   CANVAS_HEIGHT = 600,
   SOUND_MANAGER = new SoundManager([
-    "snd/Laser_Shoot.wav"
+    "snd/proj_blue_ball.wav",
+    "snd/proj_green_ball.wav"
   ], onSoundManagerLoadingComplete),
 
   BLOCK_WIDTH = 8,
@@ -98,10 +99,12 @@ function init() {
   document.addEventListener('keydown', keyDownHandler, false);
   document.addEventListener('keyup', keyUpHandler, false);
   document.addEventListener('click', function (event) {
-    SOUND_MANAGER.context.resume().then(() => {
-      console.log("Resumed SOUND_MANAGER");
-      SOUND_MANAGER.loadAllSounds();
-    });
+    if (!soundsLoaded) {
+      SOUND_MANAGER.context.resume().then(() => {
+        console.log("Resumed SOUND_MANAGER");
+        SOUND_MANAGER.loadAllSounds();
+      });
+    }
   });
 
   // Font
@@ -128,10 +131,12 @@ function init() {
 }
 
 function onSoundManagerLoadingComplete(list) {
-  console.log(list);
-  console.log("Sound loading complete!");
+  console.log("Sound loading complete!", list);
   soundsLoaded = true;
-  SOUND_MANAGER.buffers = list;
+
+  var source = SOUND_MANAGER.context.createBufferSource();
+  source.buffer = list[0];
+  source.start(0);
 }
 
 function tick() {
