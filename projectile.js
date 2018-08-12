@@ -2,8 +2,7 @@ const
   PROJ_BLUEBALL = 0,
   PROJ_GREENBALL = 1,
   PROJ_NULL = -1
-
-PROJECTILE_LIFESPAN = 2000;
+  PROJECTILE_LIFESPAN = 2000;
 
 const PROJECTILES = {
   [PROJ_BLUEBALL]: {src: {x: 54, y: 54}, size: 2, damage: 10, speed: 200, name: "proj_blue_ball"},
@@ -47,13 +46,22 @@ class Projectile {
       this.sprite.y += this.targetData.direction.y * this.speed * delta;
 
       // "Collisions"
-      for (var p=0;p<planets.getRemaining(); p++) {
+      for (var p=0; p<planets.getRemaining(); p++) {
         var planet = planets.getPlanet(p);
-        if (planet){
-          if (this.getRectangle().intersects(planet.getRectangle())){
-            //console.log("Hit planet " + planet.name + " for " + PROJECTILES[this.type].damage + "dmg.");
+        if (planet) {
+          if (this.getRectangle().intersects(planet.getRectangle())) {
             planet.health -= PROJECTILES[this.type].damage;
             this.markedForDeletion = true;
+          }
+        }
+      }
+      for (var m=0; m<monsters.getRemaining(); m++) {
+        var mon = monsters.getMonster(m);
+        if (mon) {
+          if (this.getRectangle().intersects(mon.getRectangle())) {
+            mon.health -= PROJECTILES[this.type].damage;
+            this.markedForDeletion = true;
+            player.scoreManager.rewardForKilling(mon);
           }
         }
       }

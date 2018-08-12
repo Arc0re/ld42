@@ -45,7 +45,7 @@ class Sprite {
         this.srcX = this.startingSrcX;
       }
       if (this.timesFrame[this.currentFrame]>TIME_BETWEEN_FRAMES) {
-        this.srcX += (this.currentFrame*this.width+1);
+        this.srcX = (this.srcX+this.width+1);
         this.timesFrame[this.currentFrame] = 1;
       }
     }

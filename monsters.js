@@ -7,12 +7,21 @@ class Monsters {
     for (var m=0; m<MAX_MONSTERS; m++){
       var x = Utils.randInt(0, canvas.width-BLOCK_WIDTH);
       var y = Utils.randInt(0, canvas.height-BLOCK_HEIGHT);
-      var hp = Utils.randInt(10, 50);
-      var att = Utils.randInt(5, 20);
-
-      this.monsters.push(new Monster("Monster #" + m, {x: x, y: y}, hp, att));
-      this.monsters[this.monsters.length-1].sprite.setupAnimationFrames(2);
+      var type = Utils.randInt(MON_BLUESNOWFLAKE, MON_GREENIE);
+      this.monsters.push(new Monster(type, {x: x, y: y}));
     }
+  }
+
+  get() {
+    return this.monsters;
+  }
+
+  getMonster(index) {
+    return this.monsters[index];
+  }
+
+  getRemaining() {
+    return this.monsters.length;
   }
 
   update(delta) {

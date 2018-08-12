@@ -1,20 +1,27 @@
+const
+  MON_BLUESNOWFLAKE = 0,
+  MON_PURPLELOSANGE = 1,
+  MON_GREENIE = 2;
+
+const MONSTERSDATA = {
+  [MON_BLUESNOWFLAKE]: { health: 50, attackPoints: 20, speed: 10, src: {x: 86, y: 4}, name: "alien_snowflake", animationFrames: 2, awardedPoints: 10 },
+  [MON_PURPLELOSANGE]: { health: 70, attackPoints: 30, speed: 50, src: {x: 86, y: 13}, name: "alien_losange", animationFrames: 6, awardedPoints: 20 },
+  [MON_GREENIE]: { health: 80, attackPoints: 10, speed: 10, src: {x: 86, y: 22}, name: "alien_insect", animationFrames: 3, awardedPoints: 30 },
+};
+
 class Monster {
-  constructor(name, spawnPoint, health, attack) {
-    var rnd = Utils.randInt(0, 5);
-    switch (rnd) {
-      case 0:
-      default:
-        this.sprite = new Sprite(86, 4, BLOCK_WIDTH, BLOCK_HEIGHT, name);
-        break;
-    }
-    this.name = name;
-    this.spawnPoint = spawnPoint;
-    this.health = health;
-    this.attackPoints = attack;
+  constructor(type, spawnPoint) {
+    var d = MONSTERSDATA[type];
+    this.type = type;
+    this.sprite = new Sprite(d.src.x, d.src.y, BLOCK_WIDTH, BLOCK_HEIGHT, d.name);
+    this.sprite.setupAnimationFrames(d.animationFrames);
+    this.name = d.name;
+    this.health = d.health;
+    this.attackPoints = d.attackPoints;
+    this.speed = d.speed;
     this.sprite.setPos({x: spawnPoint.x, y: spawnPoint.y});
     this.targetPlanet = null;
     this.targetData = null;
-    this.speed = Utils.randInt(5, 20);
     this.isMoving = false;
     this.attackTimeout = 3000;
   }
