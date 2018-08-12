@@ -9,9 +9,9 @@ const
 const PROJECTILE_DATA = {
   [PROJ_BLUEBALL]: {src: {x: 54, y: 54}, size: 2, damage: 5, speed: 200, name: "proj_blue_ball", coolDownMs: 50, scoreToPowerup: 50, timeBeforeDeletion: 2000},
   [PROJ_GREENBALL]: {src: {x: 54, y: 57}, size: 2, damage: 20, speed: 300, name: "proj_green_ball", coolDownMs: 100, scoreToPowerup: 200, timeBeforeDeletion: 2000},
-  [PROJ_REDBEAM]: {src: {x: 54, y: 61}, size: 3, damage: 60, speed: 400, name: "proj_redbeam2", coolDownMs: 20, scoreToPowerup: 500, timeBeforeDeletion: 5000},
-  [PROJ_BIGBALL]: {src: {x: 54, y: 66}, size: 8, damage: 150, speed: 100, name: "proj_bigball", coolDownMs: 300, scoreToPowerup: 2000, timeBeforeDeletion: 8000},
-  [PROJ_STAR]: {src: {x: 54, y: 76}, size: 16, damage: 500, speed: 50, name: "proj_star", coolDownMs: 800, scoreToPowerup: 1000, timeBeforeDeletion: 10000},
+  [PROJ_REDBEAM]: {src: {x: 54, y: 61}, size: 3, damage: 40, speed: 400, name: "proj_redbeam2", coolDownMs: 30, scoreToPowerup: 500, timeBeforeDeletion: 5000},
+  [PROJ_BIGBALL]: {src: {x: 54, y: 66}, size: 8, damage: 150, speed: 100, name: "proj_bigball", coolDownMs: 300, scoreToPowerup: 1000, timeBeforeDeletion: 8000},
+  [PROJ_STAR]: {src: {x: 54, y: 76}, size: 16, damage: 500, speed: 50, name: "proj_star", coolDownMs: 800, scoreToPowerup: 2000, timeBeforeDeletion: 10000},
 };
 
 class Projectile {

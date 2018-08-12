@@ -80,7 +80,7 @@ var canvas = document.getElementById("game_canvas"),
   highScore = 0,
   alienKilledCount = 0,
 
-  sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT),
+  sprite = new Sprite(9, 0, BLOCK_WIDTH, BLOCK_HEIGHT),
   spaceMap = new Space(SPACE_WIDTH, SPACE_HEIGHT),
   player = new Player(),
   planets = new Planets(),
