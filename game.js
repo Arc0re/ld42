@@ -339,6 +339,7 @@ function displayHighScoreEtc() {
 
 // Retarded
 function keyDownHandler(event) {
+  event.preventDefault();
   switch (event.code) {
     case KEYBOARD_DOWN:
       keysDown[DOWN_KEY] = true;
@@ -374,6 +375,7 @@ function keyDownHandler(event) {
 }
 
 function keyUpHandler(event) {
+  event.preventDefault();
   switch (event.code) {
     case KEYBOARD_DOWN:
       keysDown[DOWN_KEY] = false;
