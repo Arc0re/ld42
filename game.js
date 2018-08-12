@@ -12,13 +12,16 @@ const
     "snd/powerdown.wav",
     "snd/ouch.wav",
     "snd/hit_player.wav",
-    "snd/proj_redbeam2.wav"
+    "snd/proj_redbeam2.wav",
+    "snd/explosion.wav",
+    "snd/pause.wav",
+    "snd/start.wav"
   ], onSoundManagerLoadingComplete),
 
   BLOCK_WIDTH = 8,
   BLOCK_HEIGHT = 8,
-  SPACE_WIDTH = 120,
-  SPACE_HEIGHT = 120,
+  SPACE_WIDTH = 80,
+  SPACE_HEIGHT = 80,
   GAME_AREA_PIXEL_WIDTH = SPACE_WIDTH * BLOCK_WIDTH,
   GAME_AREA_PIXEL_HEIGHT = SPACE_HEIGHT * BLOCK_HEIGHT,
   GAME_AREA_PIXEL_WIDTH_SCALED = GAME_AREA_PIXEL_WIDTH * CANVAS_SCALE,
@@ -28,10 +31,11 @@ const
   SPACETILE_STAR1 = 2,
   SPACETILE_STAR2 = 3,
 
-  GAMESTATE_MENU = 0,
+  GAMESTATE_TITLESCREEN = 0,
   GAMESTATE_INGAME = 1,
   GAMESTATE_GAMEOVER = 2,
   GAMESTATE_VICTORY = 3,
+  GAMESTATE_PAUSE = 4,
   GAMESTATE_NONE = 99,
 
   KEYBOARD_UP = 'KeyW',
@@ -64,7 +68,7 @@ var canvas = document.getElementById("game_canvas"),
   lastTime = null,
   windowWidth = 0, windowHeight = 0,
   currentState = GAMESTATE_NONE,
-  startingState = GAMESTATE_VICTORY,
+  startingState = GAMESTATE_TITLESCREEN,
   keysDown = [],
   doneLoading = false,
   fontLoaded = false,
@@ -173,6 +177,14 @@ function tick() {
 
 function update(delta) {
   switch (currentState) {
+    case GAMESTATE_TITLESCREEN: {
+      if (keysDown[ENTER_KEY]) {
+        keysDown[ENTER_KEY] = false;
+        currentState = GAMESTATE_INGAME;
+        SOUND_MANAGER.play("start");
+      }
+    } break;
+
     case GAMESTATE_INGAME: {
       var pixPerSec = 50;
       var sp = sprite.getPos();
@@ -194,9 +206,19 @@ function update(delta) {
       if (monsters.getRemaining() <= 0 && planets.getRemaining() > 0) {
         currentState = GAMESTATE_VICTORY;
       }
+
+      if (keysDown[ENTER_KEY]) {
+        keysDown[ENTER_KEY] = false;
+        currentState = GAMESTATE_PAUSE;
+        SOUND_MANAGER.play("pause");
+      }
     } break;
 
-    case GAMESTATE_MENU: {
+    case GAMESTATE_PAUSE: {
+      if (keysDown[ENTER_KEY]) {
+        keysDown[ENTER_KEY] = false;
+        currentState = GAMESTATE_INGAME;
+      }
     } break;
 
     case GAMESTATE_GAMEOVER:
@@ -213,7 +235,27 @@ function render() {
   if (!doneLoading) return;
 
   switch (currentState) {
-    case GAMESTATE_INGAME:
+    case GAMESTATE_TITLESCREEN: {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (fontLoaded) {
+        png_font.drawText("METAL SHIP SOLID",[280, 20],'purple',2,'darkblue');
+        png_font.drawText("SPACE EATER",[CANVAS_WIDTH/2-160, 30],'darkblue',8,'blue');
+        Utils.blink(800, function () {
+          png_font.drawText("PRESS ENTER TO BEGIN",[160, CANVAS_HEIGHT/2],'white',3,'blue');
+        });
+
+        png_font.drawText("The Galaxy needs you!", [CANVAS_WIDTH/2-160, CANVAS_HEIGHT/2+60], "red", 2,"blue");
+        png_font.drawText("Destroy all the aliens, save the planets!", [70, CANVAS_HEIGHT/2+90], "red", 2,"blue");
+
+        png_font.drawText("[ WASD   ]: Move Ship", [110, CANVAS_HEIGHT/2+150], 'grey', 2, 'blue');
+        png_font.drawText("[ Arrows ]: Fire", [110, CANVAS_HEIGHT/2+180], 'grey', 2, 'blue');
+        png_font.drawText("[ Enter  ]: Pause", [110, CANVAS_HEIGHT/2+210], 'grey', 2, 'blue');
+
+        png_font.drawText("2018 - LD42Compo - github.com/Arc0re", [110, CANVAS_HEIGHT-40], 'darkgrey', 2, 'blue');
+      }
+    } break;
+
+    case GAMESTATE_INGAME: {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       var px = player.sprite.x;//*CANVAS_SCALE;
@@ -233,17 +275,23 @@ function render() {
       ctx.setTransform(1, 0, 0, 1, 0, 0); // faster??
 
       if (fontLoaded) {
+        png_font.drawText("Aliens: " + monsters.getRemaining(), [CANVAS_WIDTH - 200, 0], "lightblue", 2, "blue");
         png_font.drawText("Planets remaining: " + planets.getRemaining(), [10, canvas.height - 40], "lightblue", 2, "blue");
         png_font.drawText(player.scoreManager.getScore().toString(), [5, 0], "lightblue", 2, "blue");
-        png_font.drawText("HIGH SCORE", [(canvas.width/2)-90, 0], "red", 2, "darkred");
-        png_font.drawText(highScore.toString(), [(canvas.width/2)-30, 30], "white", 2, "black");
+        png_font.drawText(player.health.toString() + " HP", [5, 30], "red", 2, "blue");
+        png_font.drawText("HIGH SCORE", [(canvas.width / 2) - 90, 0], "red", 2, "darkred");
+        png_font.drawText(highScore.toString(), [(canvas.width / 2) - 30, 30], "white", 2, "black");
         if (!soundsLoaded) {
           Utils.blink(500, function () {
-            png_font.drawText("**CLICK FOR SOUND**", [canvas.width/2+50, canvas.height - 40], "white", 2, "black");
+            png_font.drawText("**CLICK FOR SOUND**", [canvas.width / 2 + 50, canvas.height - 40], "white", 2, "black");
           });
         }
       }
-      break;
+    } break;
+
+    case GAMESTATE_PAUSE: {
+      png_font.drawText("PAUSED", [CANVAS_WIDTH/2-60, CANVAS_HEIGHT/2-40], 'orange', 3, 'blue');
+    } break;
 
     case GAMESTATE_GAMEOVER: {
       ctx.clearRect(0, 0, canvas.width, canvas.height);

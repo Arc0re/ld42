@@ -78,6 +78,7 @@ class Planets {
         if (planet.destroyed) {
           console.log("Destroyed planet ", planet);
           this.planets.splice(p, 1);
+          SOUND_MANAGER.play("explosion");
         }
       }
     }
