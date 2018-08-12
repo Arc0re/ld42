@@ -5,7 +5,7 @@ const
   PROJECTILE_LIFESPAN = 2000;
 
 const PROJECTILE_DATA = {
-  [PROJ_BLUEBALL]: {src: {x: 54, y: 54}, size: 2, damage: 10, speed: 200, name: "proj_blue_ball", coolDownMs: 500, scoreToPowerup: 50},
+  [PROJ_BLUEBALL]: {src: {x: 54, y: 54}, size: 2, damage: 5, speed: 200, name: "proj_blue_ball", coolDownMs: 50, scoreToPowerup: 50},
   [PROJ_GREENBALL]: {src: {x: 54, y: 57}, size: 2, damage: 20, speed: 300, name: "proj_green_ball", coolDownMs: 100, scoreToPowerup: 200}
 };
 

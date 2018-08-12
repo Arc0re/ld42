@@ -9,7 +9,8 @@ const
     "snd/proj_green_ball.wav",
     "snd/powerup.wav",
     "snd/hit.wav",
-    "snd/powerdown.wav"
+    "snd/powerdown.wav",
+    "snd/ouch.wav"
   ], onSoundManagerLoadingComplete),
 
   BLOCK_WIDTH = 8,

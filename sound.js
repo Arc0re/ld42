@@ -1,14 +1,19 @@
 class SoundManager {
-  constructor(soundNames, onComplete) {
+  constructor(soundUrls, onComplete) {
     window.AudioContext = window.AudioContext||window.webkitAudioContext;
+
+    this.VOLUME = 0.2; // 20%
     this.context = new window.AudioContext();
-    this.soundUrls = soundNames;
+    this.gainNode = this.context.createGain();
+    this.gainNode.gain.value = this.VOLUME;
+    this.gainNode.connect(this.context.destination);
+    this.soundUrls = soundUrls;
     this.buffers = [];
     this.onCompleteCallback = onComplete;
     this.loadCount = 0; // when its done, callback
   }
 
-  loadBufferAsync(url, index, name) {
+  loadBufferAsync(url, index, nafedfme) {
     var _this = this;
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
@@ -54,8 +59,8 @@ class SoundManager {
     if (!soundsLoaded) return;
     var data = this.buffers.find(obj => { return obj.name === soundName; });
     var source = this.context.createBufferSource();
-    source.buffer = data.buffer;//this.buffers[soundID];
-    source.connect(this.context.destination);
+    source.buffer = data.buffer;
+    source.connect(this.gainNode);
     source.start(0);
   }
 }

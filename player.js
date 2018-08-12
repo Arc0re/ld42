@@ -18,11 +18,12 @@ class ScoreManager {
     this.score -= amount;
     if (this.score<=0) this.score = 0;
     this.applyPowerup();
+    SOUND_MANAGER.play("ouch");
   }
 
   applyPowerup() {
     var minScoreForWeapon = (PROJECTILE_DATA[this.playerRef.projectileType-1])?PROJECTILE_DATA[this.playerRef.projectileType-1].scoreToPowerup:0;
-    if (this.score >= PROJECTILE_DATA[this.playerRef.projectileType].scoreToPowerup) {
+    if (this.score >= PROJECTILE_DATA[this.playerRef.projectileType].scoreToPowerup && typeof PROJECTILE_DATA[this.playerRef.projectileType+1] !== 'undefined') {
       SOUND_MANAGER.play("powerup");
       this.playerRef.projectileType++;
     } else if (minScoreForWeapon === 0) {
