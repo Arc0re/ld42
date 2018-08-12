@@ -18,6 +18,7 @@ class Monster {
     this.name = d.name;
     this.health = d.health;
     this.attackPoints = d.attackPoints;
+    this.awardedPoints = d.awardedPoints;
     this.speed = d.speed;
     this.sprite.setPos({x: spawnPoint.x, y: spawnPoint.y});
     this.targetPlanet = null;
@@ -27,7 +28,7 @@ class Monster {
   }
 
   getRectangle() {
-    return new Rectangle(Math.floor(this.sprite.x), Math.floor(this.sprite.y), this.sprite.width, this.sprite.height);
+    return this.sprite.getRectangle();
   }
 
   update(delta) {
@@ -40,6 +41,8 @@ class Monster {
         // https://gamedev.stackexchange.com/questions/23447/moving-from-ax-y-to-bx1-y1-with-constant-speed
         var vecStart = new Utils.Vector(this.sprite.x, this.sprite.y);
         var vecDest = chosenOne.getTranslatedOrigin();
+        var rnd = Utils.randInt(0, 1);
+        vecDest = (rnd===0)?Utils.vector.add(vecDest, {x: -20, y: -10}):Utils.vector.add(vecDest, {x: chosenOne.width*Utils.randInt(2, 4), y:-30});
         var distance = Utils.vector.dist(vecStart, vecDest);
         var direction = Utils.vector.normalize(Utils.vector.sub(vecDest, vecStart));
         this.sprite.setPos(vecStart);
@@ -62,6 +65,9 @@ class Monster {
 
   render() {
     this.sprite.render();
+    if (DEBUG_SHOW_COLLISION_BOXES) {
+      this.getRectangle().drawCollisionBox();
+    }
   }
 
   attack() {

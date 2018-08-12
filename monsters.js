@@ -25,16 +25,25 @@ class Monsters {
   }
 
   update(delta) {
-    for (var m=0; m<MAX_MONSTERS; m++){
-      var mon = this.monsters[m];
-      if (mon) mon.update(delta);
+    var m = this.getRemaining();
+    if (m<=0) return;
+    while (m--) {
+      var alien = this.monsters[m];
+      if (alien) {
+        alien.update(delta);
+        if (alien.health<=0) {
+          this.monsters.splice(m, 1);
+        }
+      }
     }
   }
 
   render() {
     for (var m = 0; m < MAX_MONSTERS; m++) {
       var mon = this.monsters[m];
-      if (mon) mon.render();
+      if (mon) {
+        mon.render();
+      }
     }
   }
 }

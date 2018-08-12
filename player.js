@@ -4,8 +4,17 @@ class ScoreManager {
     this.score = 0;
   }
 
+  getScore() {
+    return this.score;
+  }
+
   rewardForKilling(alien) {
     this.score += alien.awardedPoints;
+  }
+
+  malus(amount) {
+    this.score -= amount;
+    if (this.score<=0) this.score = 0;
   }
 }
 

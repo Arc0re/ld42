@@ -40,7 +40,9 @@ const
   SHOOT_RIGHT_KEY = 4,
   SHOOT_LEFT_KEY = 5,
   SHOOT_UP_KEY = 6,
-  SHOOT_DOWN_KEY = 7;
+  SHOOT_DOWN_KEY = 7,
+
+  DEBUG_SHOW_COLLISION_BOXES = false;
 
 var canvas = document.getElementById("game_canvas"),
   ctx = canvas.getContext("2d"),
@@ -56,7 +58,6 @@ var canvas = document.getElementById("game_canvas"),
   mousePos = null,
   mouseClickedVec = null,
   mouseClicked = false,
-  score = 0,
 
   sprite = new Sprite(0, 0, BLOCK_WIDTH, BLOCK_HEIGHT),
   spaceMap = new Space(SPACE_WIDTH, SPACE_HEIGHT),
@@ -202,6 +203,7 @@ function render() {
 
       if (fontLoaded) {
         png_font.drawText("Planets remaining: " + planets.getRemaining(), [10, canvas.height - 40], "lightblue", 2, "blue");
+        png_font.drawText("Score: " + player.scoreManager.getScore(), [canvas.width-200, canvas.height - 40], "lightblue", 2, "blue");
         try {
           png_font.drawText("MousePos: " + mousePos.x + "," + mousePos.y, [5, 0], "lightblue", 2, "blue");
         } catch (ex) {
@@ -213,7 +215,7 @@ function render() {
       if (fontLoaded) {
         //png_font.drawText("Café",[160,40],'orange',4,'blue');
         png_font.drawText("GAME OVER",[CANVAS_WIDTH/2-140, CANVAS_HEIGHT/2-140],'red',8,'purple');
-        png_font.drawText("Score: " + score, [CANVAS_WIDTH/2-300, CANVAS_HEIGHT/2+140], 'darkblue', 3, 'blue');
+        png_font.drawText("Score: " + player.scoreManager.getScore(), [CANVAS_WIDTH/2-300, CANVAS_HEIGHT/2+140], 'darkblue', 3, 'blue');
       }
     } break;
 

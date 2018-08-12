@@ -32,6 +32,7 @@ class Planet {
     this.colour = colour;
     this.health = planetData.health;
     this.destroyed = false;
+    this.malusForFriendlyFire = planetData.malusForFriendlyFire;
   }
 
   getTranslatedOrigin() {
@@ -39,8 +40,7 @@ class Planet {
   }
 
   getRectangle() {
-    var p = this.getTranslatedOrigin();
-    return new Rectangle(p.x, p.y, this.width*BLOCK_WIDTH, this.height*BLOCK_WIDTH);
+    return new Rectangle(this.origin.x, this.origin.y, Math.floor(this.width*2.6), Math.floor(this.height*2.6));
   }
 
   init() {
@@ -77,5 +77,9 @@ class Planet {
 
     const p = this.origin;
     if (fontLoaded) png_font.drawText("Health: " + this.health, [p.x-20,p.y-20], "red", 1, "blue");
+
+    if (DEBUG_SHOW_COLLISION_BOXES) {
+      this.getRectangle().drawCollisionBox();
+    }
   }
 }

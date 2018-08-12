@@ -22,11 +22,10 @@ class Projectile {
   }
 
   getRectangle() {
-    return new Rectangle(Math.floor(this.sprite.x), Math.floor(this.sprite.y), this.sprite.width, this.sprite.height);
+    return this.sprite.getRectangle();
   }
 
   fire(vecStart, vecDest) {
-    console.log(vecStart, vecDest);
     var distance = Utils.vector.dist(vecStart, vecDest);
     var direction = Utils.vector.normalize(Utils.vector.sub(vecDest, vecStart));
     this.sprite.setPos(vecStart);
@@ -52,6 +51,7 @@ class Projectile {
           if (this.getRectangle().intersects(planet.getRectangle())) {
             planet.health -= PROJECTILES[this.type].damage;
             this.markedForDeletion = true;
+            player.scoreManager.malus(planet.malusForFriendlyFire);
           }
         }
       }
@@ -61,7 +61,8 @@ class Projectile {
           if (this.getRectangle().intersects(mon.getRectangle())) {
             mon.health -= PROJECTILES[this.type].damage;
             this.markedForDeletion = true;
-            player.scoreManager.rewardForKilling(mon);
+            if (mon.health<=0) player.scoreManager.rewardForKilling(mon);
+            console.log("Player hit alien");
           }
         }
       }

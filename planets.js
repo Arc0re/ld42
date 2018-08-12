@@ -13,7 +13,8 @@ const SMALL_PLANET_DATA = {
   ],
   width: 10,
   height: 10,
-  health: 200
+  health: 200,
+  malusForFriendlyFire: 15
 };
 
 const MEDIUM_PLANET_DATA = {
@@ -37,7 +38,8 @@ const MEDIUM_PLANET_DATA = {
   ],
   width: 16,
   height: 16,
-  health: 500
+  health: 500,
+  malusForFriendlyFire: 25
 };
 
 const MAX_PLANET_PIXEL_SIZE = 16*8;

@@ -59,4 +59,10 @@ class Rectangle {
       rect.y > (this.y + this.h) ||
       (rect.y + rect.h) < this.y);
   }
+
+  drawCollisionBox() {
+    let r = this;
+    ctx.strokeStyle = "red";
+    ctx.strokeRect(r.x, r.y, r.w, r.h);
+  }
 }

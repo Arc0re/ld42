@@ -27,6 +27,10 @@ class Sprite {
     return {x: this.x, y: this.y};
   }
 
+  getRectangle() {
+    return new Rectangle(Math.floor(this.x/CANVAS_SCALE), Math.floor(this.y/CANVAS_SCALE), this.width, this.height);
+  }
+
   setupAnimationFrames(numFrames) {
     this.animated = true;
     this.animationFrames = numFrames;
