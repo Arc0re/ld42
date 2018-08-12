@@ -26,12 +26,20 @@ const
   KEYBOARD_DOWN = 68,
   KEYBOARD_LEFT = 83,
   KEYBOARD_RIGHT = 70,
+  KEYBOARD_SHOOTUP = 38,
+  KEYBOARD_SHOOTDOWN = 40,
+  KEYBOARD_SHOOTLEFT = 37,
+  KEYBOARD_SHOOTRIGHT = 39,
 
   // Mapping starts from 0 cuz we don't wanna loop until 39 for nothing
   RIGHT_KEY = 0,
   LEFT_KEY = 1,
   UP_KEY = 2,
-  DOWN_KEY = 3;
+  DOWN_KEY = 3,
+  SHOOT_RIGHT_KEY = 4,
+  SHOOT_LEFT_KEY = 5,
+  SHOOT_UP_KEY = 6,
+  SHOOT_DOWN_KEY = 7;
 
 var canvas = document.getElementById("game_canvas"),
   ctx = canvas.getContext("2d"),
@@ -144,12 +152,13 @@ function update(delta) {
       if (sp.y * CANVAS_SCALE >= GAME_AREA_PIXEL_HEIGHT_SCALED) sprite.y = 0;
       sprite.setPos({x: sprite.getPos().x + pixPerSec * delta, y: sprite.getPos().y + pixPerSec * delta});
 
-      if (mouseClicked && mouseClickedVec) {
-        player.attack(mouseClickedVec);
-        mouseClicked = false;
-      }
+      // if (mouseClicked && mouseClickedVec) {
+      //   player.attack(mouseClickedVec);
+      //   mouseClicked = false;
+      // }
 
       monsters.update(delta);
+      planets.update(delta);
       player.update(delta);
       projectiles.update(delta);
     }
@@ -184,8 +193,14 @@ function render() {
         png_font.drawText("Planets remaining: " + planets.getRemaining(), [10, canvas.height - 40], "lightblue", 2, "blue");
         // for (var i=0;i<planets.getRemaining(); i++) {
         //   var p = planets.getPlanet(i);
-        //   if (p) png_font.drawText("Health: " + p.health, [p.origin.x, p.origin.y-16], "red", 1);
-        // }
+        //   if (p) {
+        //     var pos = p.getTranslatedOrigin();
+        //     try {
+        //       png_font.drawText("Health: " + p.health, [pos.x, pos.y], "red", 1, "blue");
+        //     } catch (ex) {
+        //     }
+        //   }
+        //}
         try {
           png_font.drawText("MousePos: " + mousePos.x + "," + mousePos.y, [5, 0], "lightblue", 2, "blue");
         } catch (ex) {
@@ -233,6 +248,18 @@ function keyDownHandler(event) {
     case KEYBOARD_RIGHT:
       keysDown[RIGHT_KEY] = true;
       break;
+    case KEYBOARD_SHOOTDOWN:
+      keysDown[SHOOT_DOWN_KEY] = true;
+      break;
+    case KEYBOARD_SHOOTUP:
+      keysDown[SHOOT_UP_KEY] = true;
+      break;
+    case KEYBOARD_SHOOTLEFT:
+      keysDown[SHOOT_LEFT_KEY] = true;
+      break;
+    case KEYBOARD_SHOOTRIGHT:
+      keysDown[SHOOT_RIGHT_KEY] = true;
+      break;
   }
 }
 
@@ -249,6 +276,18 @@ function keyUpHandler(event) {
       break;
     case KEYBOARD_RIGHT:
       keysDown[RIGHT_KEY] = false;
+      break;
+    case KEYBOARD_SHOOTDOWN:
+      keysDown[SHOOT_DOWN_KEY] = false;
+      break;
+    case KEYBOARD_SHOOTUP:
+      keysDown[SHOOT_UP_KEY] = false;
+      break;
+    case KEYBOARD_SHOOTLEFT:
+      keysDown[SHOOT_LEFT_KEY] = false;
+      break;
+    case KEYBOARD_SHOOTRIGHT:
+      keysDown[SHOOT_RIGHT_KEY] = false;
       break;
   }
 }

@@ -3,7 +3,7 @@ const
   PROJ_GREENBALL = 1,
   PROJ_NULL = -1
 
-  PROJECTILE_LIFESPAN = 2000;
+PROJECTILE_LIFESPAN = 2000;
 
 const PROJECTILES = {
   [PROJ_BLUEBALL]: {src: {x: 54, y: 54}, size: 2, damage: 10, speed: 200, name: "proj_blue_ball"},
@@ -19,6 +19,11 @@ class Projectile {
     this.markedForDeletion = false;
     this.timeBeforeDeletion = null;
     this.speed = PROJECTILES[type].speed;
+    this.type = type;
+  }
+
+  getRectangle() {
+    return new Rectangle(Math.floor(this.sprite.x), Math.floor(this.sprite.y), this.sprite.width, this.sprite.height);
   }
 
   fire(vecStart, vecDest) {
@@ -42,12 +47,18 @@ class Projectile {
       this.sprite.y += this.targetData.direction.y * this.speed * delta;
 
       // "Collisions"
-      if (this.arrived
-        //| ((this.sprite.x>=canvas.width || this.sprite.x<=0) || (this.sprite.y>=canvas.height || this.sprite.y<=0))
-      ) {
-        this.markedForDeletion = true;
+      for (var p=0;p<planets.getRemaining(); p++) {
+        var planet = planets.getPlanet(p);
+        if (planet){
+          if (this.getRectangle().intersects(planet.getRectangle())){
+            //console.log("Hit planet " + planet.name + " for " + PROJECTILES[this.type].damage + "dmg.");
+            planet.health -= PROJECTILES[this.type].damage;
+            this.markedForDeletion = true;
+          }
+        }
       }
 
+      if (this.arrived) this.markedForDeletion = true;
       if (Utils.vector.dist(this.targetData.start, this.sprite.getPos()) >= this.targetData.distance) {
         this.sprite.setPos(this.targetData.end);
         this.isMoving = false;

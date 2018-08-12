@@ -13,7 +13,7 @@ const SMALL_PLANET_DATA = {
   ],
   width: 10,
   height: 10,
-  health: 20
+  health: 200
 };
 
 const MEDIUM_PLANET_DATA = {
@@ -37,7 +37,7 @@ const MEDIUM_PLANET_DATA = {
   ],
   width: 16,
   height: 16,
-  health: 50
+  health: 500
 };
 
 const MAX_PLANET_PIXEL_SIZE = 16*8;
@@ -66,10 +66,25 @@ class Planets {
     return this.planets[index];
   }
 
+  update(delta) {
+    var p = this.getRemaining();
+    if (p<=0) return; // TODO: Game over
+    while (p--) {
+      var planet = this.planets[p];
+      if (planet) {
+        planet.update(delta);
+        if (planet.destroyed) {
+          console.log("Destroyed planet ", planet);
+          this.planets.splice(p, 1);
+        }
+      }
+    }
+  }
+
   render() {
     for (var p = 0; p < this.planets.length; p++) {
       var planet = this.planets[p];
-      if (planet) {
+      if (planet && !planet.destroyed) {
         planet.render();
       }
     }

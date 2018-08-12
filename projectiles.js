@@ -9,13 +9,13 @@ class Projectiles {
 
   update(delta) {
     var p = this.projectiles.length;
-    if (p<0) return;
+    if (p<=0) return;
     while (p--) {
       var projectile = this.projectiles[p];
       if (projectile) {
         projectile.update(delta);
         if (projectile.markedForDeletion) {
-          console.log("Destroying projectile nb : ", p, projectile);
+          //console.log("Destroying projectile nb : ", p, projectile);
           projectile.arrived = true;
           this.projectiles.splice(p, 1);
         }

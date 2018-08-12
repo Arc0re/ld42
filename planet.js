@@ -31,10 +31,16 @@ class Planet {
     this.name = name;
     this.colour = colour;
     this.health = planetData.health;
+    this.destroyed = false;
   }
 
   getTranslatedOrigin() {
     return {x: this.origin.x*CANVAS_SCALE, y: this.origin.y*CANVAS_SCALE};
+  }
+
+  getRectangle() {
+    var p = this.getTranslatedOrigin();
+    return new Rectangle(p.x, p.y, this.width*BLOCK_WIDTH, this.height*BLOCK_WIDTH);
   }
 
   init() {
@@ -50,6 +56,12 @@ class Planet {
     console.log("Created planet " + this.name + " at {x: " + this.origin.x + ", y: " + this.origin.y + "}");
   }
 
+  update(delta) {
+    if (this.health<=0){
+      this.destroyed = true;
+    }
+  }
+
   render() {
     for (var x = 0; x < this.width; x++) {
       for (var y = 0; y < this.height; y++) {
@@ -62,5 +74,8 @@ class Planet {
         }
       }
     }
+    if (fontLoaded) png_font.drawText("Café",[160,40],'orange',4,'blue');
+    const p = this.origin;
+    if (fontLoaded) png_font.drawText("Health: " + this.health, [p.x-20,p.y-20], "red", 1, "blue");
   }
 }
